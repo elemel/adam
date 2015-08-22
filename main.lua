@@ -37,7 +37,7 @@ function love.load()
       right = {"d", "right"},
 
       jump = {" "},
-      grab = {"lshift"},
+      throw = {"lshift"},
     },
 
     updates = {
@@ -53,20 +53,102 @@ function love.load()
     },
 
     images = {},
+
+    skins = {
+      adam = {
+        falling = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/holding.png"),
+          },
+        },
+
+        jumping = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/standing.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/holding.png"),
+          },
+        },
+
+        standing = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/standing.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
+          },
+        },
+
+        walking = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
+          },
+        },
+      },
+    }
   }
 
   local pixelData = love.image.newImageData(1, 1)
   pixelData:setPixel(0, 0, 255, 255, 255, 255)
   game.images.pixel = love.graphics.newImage(pixelData)
 
+  local ballData = love.image.newImageData(4, 4)
+
+  ballData:setPixel(1, 0, 255, 255, 255, 127)
+  ballData:setPixel(2, 0, 255, 255, 255, 127)
+
+  ballData:setPixel(0, 1, 255, 255, 255, 127)
+  ballData:setPixel(1, 1, 255, 255, 255, 255)
+  ballData:setPixel(2, 1, 255, 255, 255, 255)
+  ballData:setPixel(3, 1, 255, 255, 255, 127)
+
+  ballData:setPixel(0, 2, 255, 255, 255, 127)
+  ballData:setPixel(1, 2, 255, 255, 255, 255)
+  ballData:setPixel(2, 2, 255, 255, 255, 255)
+  ballData:setPixel(3, 2, 255, 255, 255, 127)
+
+  ballData:setPixel(1, 3, 255, 255, 255, 127)
+  ballData:setPixel(2, 3, 255, 255, 255, 127)
+
+  game.images.ball = love.graphics.newImage(ballData)
+
+  for name, image in pairs(game.images) do
+    image:setFilter("nearest")
+  end
+
+  for _, skin in pairs(game.skins) do
+    for _, animation in pairs(skin) do
+      for _, part in pairs(animation) do
+        for i, image in pairs(part) do
+          image:setFilter("nearest")
+        end
+      end
+    end
+  end
+
   Terrain.new()
   Character.new({
     name = "adam",
+    skin = game.skins.adam,
     color = {common.toByteColor(0.5, 1, 0, 1)},
   })
 
   Character.new({
     name = "victor",
+    skin = game.skins.adam,
     x = -2,
     color = {common.toByteColor(0, 0.75, 1, 1)},
   })
@@ -74,6 +156,7 @@ function love.load()
   for i = 1, 8 do
     local villager = Character.new({
       tags = {"villager"},
+      skin = game.skins.adam,
       x = 4 + 8 * love.math.random(),
       color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},
     })

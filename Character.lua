@@ -1,3 +1,4 @@
+local Animation = require "Animation"
 local common = require "common"
 
 local Character = {}
@@ -21,7 +22,10 @@ function Character.new(args)
   character.height = 2
   character.width = 1
 
-  character.state = "standing"
+  character.direction = 1
+
+  character.upperState = "standing"
+  character.lowerState = "standing"
 
   character.walkAcceleration = 16
   character.stopAcceleration = 16
@@ -38,9 +42,23 @@ function Character.new(args)
   character.jumpInput = false
   character.throwInput = false
 
+  character.skin = args.skin or game.skins.adam
   character.color = args.color or {255, 255, 255, 255}
 
+  character.lowerAnimationState = "standing"
+
+  character.lowerAnimation = Animation.new({
+    images = character.skin.standing.lower,
+  })
+
+  character.upperAnimationState = "standing"
+
+  character.upperAnimation = Animation.new({
+    images = character.skin.standing.upper,
+  })
+
   game.updates.physics[character] = Character.update
+  game.updates.animation[character] = Character.updateAnimation
   game.draws.scene[character] = Character.draw
 
   for i, tag in pairs(character.tags) do
@@ -64,6 +82,7 @@ function Character:destroy()
   end
 
   game.draws.scene[character] = nil
+  game.updates.animation[character] = nil
   game.updates.physics[character] = nil
 
   self.body:destroy()
@@ -71,6 +90,10 @@ end
 
 function Character:update(dt)
   local inputX = (self.rightInput and 1 or 0) - (self.leftInput and 1 or 0)
+
+  if inputX ~= 0 then
+    self.direction = inputX
+  end
 
   self.x = self.x + self.dx * dt
   self.y = self.y + self.dy * dt
@@ -89,9 +112,9 @@ function Character:update(dt)
     end
   end
 
-  if self.state == "falling" then
+  if self.lowerState == "falling" then
     if ground then
-      self.state = "standing"
+      self.lowerState = "standing"
       return
     end
 
@@ -99,25 +122,26 @@ function Character:update(dt)
     self.dy = math.min(self.dy, self.maxFallVelocity)
   end
 
-  if self.state == "jumping" then
+  if self.lowerState == "jumping" then
     self.dy = -self.jumpVelocity
-    self.state = "falling"
+    self.lowerState = "falling"
+    self.upperState = "falling"
     return
   end
 
-  if self.state == "standing" then
+  if self.lowerState == "standing" then
     if not ground then
-      self.state = "falling"
+      self.lowerState = "falling"
       return
     end
 
     if self.jumpInput then
-      self.state = "jumping"
+      self.lowerState = "jumping"
       return
     end
 
     if inputX ~= 0 then
-      self.state = "walking"
+      self.lowerState = "walking"
       return
     end
 
@@ -128,25 +152,46 @@ function Character:update(dt)
     end
   end
 
-  if self.state == "walking" then
+  if self.lowerState == "walking" then
     if not ground then
-      self.state = "falling"
+      self.lowerState = "falling"
       return
     end
 
     if self.jumpInput then
-      self.state = "jumping"
+      self.lowerState = "jumping"
       return
     end
 
     if inputX == 0 then
-      self.state = "standing"
+      self.lowerState = "standing"
       return
     end
 
     self.dx = self.dx + inputX * self.walkAcceleration * dt
     self.dx = common.clamp(self.dx, -self.maxWalkVelocity, self.maxWalkVelocity)
   end
+end
+
+function Character:updateAnimation(dt)
+  if self.lowerAnimationState ~= self.lowerState then
+    self.lowerAnimation = Animation.new({
+      images = self.skin[self.lowerState].lower,
+    })
+
+    self.lowerAnimationState = self.lowerState
+  end
+
+  if self.upperAnimationState ~= self.upperState then
+    self.upperAnimation = Animation.new({
+      images = self.skin[self.upperState].upper,
+    })
+
+    self.upperAnimationState = self.upperState
+  end
+
+  self.lowerAnimation:update(dt)
+  self.upperAnimation:update(dt)
 
   if self.fire then
     self.fire.x = self.x
@@ -156,7 +201,14 @@ end
 
 function Character:draw()
   love.graphics.setColor(self.color)
-  love.graphics.rectangle("fill", self.x - 0.5 * self.width, self.y - 0.5 * self.height, self.width, self.height)
+
+  local lowerImage = self.lowerAnimation.images[self.lowerAnimation.index]
+  local lowerWidth, lowerHeight = lowerImage:getDimensions()
+  love.graphics.draw(lowerImage, self.x, self.y, 0, self.direction / 8, 1 / 8, 0.5 * lowerWidth, 0.5 * lowerHeight)
+
+  local upperImage = self.upperAnimation.images[self.upperAnimation.index]
+  local upperWidth, upperHeight = upperImage:getDimensions()
+  love.graphics.draw(upperImage, self.x, self.y, 0, self.direction / 8, 1 / 8, 0.5 * upperWidth, 0.5 * upperHeight)
 end
 
 return Character

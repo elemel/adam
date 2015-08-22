@@ -10,12 +10,12 @@ function Fire.new(args)
   fire.x = args.x or 0
   fire.y = args.y or 0
 
-  fire.particles = love.graphics.newParticleSystem(game.images.pixel, 32)
+  fire.particles = love.graphics.newParticleSystem(game.images.ball, 16)
   fire.particles:setPosition(fire.x, fire.y)
-  fire.particles:setEmissionRate(64)
+  fire.particles:setEmissionRate(32)
   fire.particles:setParticleLifetime(0.5)
   fire.particles:setAreaSpread("uniform", 0.25, 0.25)
-  fire.particles:setSizes(1 / 4)
+  fire.particles:setSizes(1 / 8)
   fire.particles:setColors(
     {common.toByteColor(1, 0, 0, 0)},
     {common.toByteColor(1, 0.25, 0, 0.5)},
