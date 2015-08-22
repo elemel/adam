@@ -1,5 +1,6 @@
 local Character = require "Character"
 local common = require "common"
+local Fire = require "Fire"
 local KeyboardControls = require "KeyboardControls"
 local Terrain = require "Terrain"
 local TrackingShot = require "TrackingShot"
@@ -43,13 +44,20 @@ function love.load()
       input = {},
       physics = {},
       collision = {},
-      camera = {},
+      animation = {},
     },
 
     draws = {
       scene = {},
+      particles = {},
     },
+
+    images = {},
   }
+
+  local pixelData = love.image.newImageData(1, 1)
+  pixelData:setPixel(0, 0, 255, 255, 255, 255)
+  game.images.pixel = love.graphics.newImage(pixelData)
 
   Terrain.new()
   Character.new({
@@ -64,10 +72,15 @@ function love.load()
   })
 
   for i = 1, 8 do
-    Character.new({
+    local villager = Character.new({
       tags = {"villager"},
       x = 4 + 8 * love.math.random(),
-      color = {common.toByteColor(1, 0.25 * love.math.random(), 0.25 * love.math.random(), 1)},
+      color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},
+    })
+
+    villager.fire = Fire.new({
+      x = villager.x,
+      y = villager.y,
     })
   end
 
@@ -80,7 +93,7 @@ function love.update(dt)
   game.dt = math.min(game.dt + dt, game.maxDt)
 
   if game.dt > game.minDt then
-    for i, phase in ipairs({"input", "physics", "collision", "camera"}) do
+    for i, phase in ipairs({"input", "physics", "collision", "animation"}) do
       for entity, handler in pairs(game.updates[phase]) do
         handler(entity, dt)
       end
@@ -96,7 +109,7 @@ function love.draw()
   love.graphics.scale(game.camera.scale * height)
   love.graphics.translate(-game.camera.x, -game.camera.y)
 
-  for i, phase in ipairs({"scene"}) do
+  for i, phase in ipairs({"scene", "particles"}) do
     for entity, handler in pairs(game.draws[phase]) do
       handler(entity, dt)
     end

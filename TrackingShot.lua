@@ -7,13 +7,13 @@ function TrackingShot.new(args)
   local shot = {}
   setmetatable(shot, TrackingShot)
 
-  game.updates.camera[shot] = TrackingShot.update
+  game.updates.animation[shot] = TrackingShot.update
 
   return terrshotn
 end
 
 function TrackingShot:destroy()
-  game.updates.camera[self] = nil
+  game.updates.animation[self] = nil
 end
 
 function TrackingShot:update(dt)

@@ -21,7 +21,7 @@ function Character.new(args)
   character.height = 2
   character.width = 1
 
-  character.state = "stand"
+  character.state = "standing"
 
   character.walkAcceleration = 16
   character.stopAcceleration = 16
@@ -89,9 +89,9 @@ function Character:update(dt)
     end
   end
 
-  if self.state == "fall" then
+  if self.state == "falling" then
     if ground then
-      self.state = "stand"
+      self.state = "standing"
       return
     end
 
@@ -99,25 +99,25 @@ function Character:update(dt)
     self.dy = math.min(self.dy, self.maxFallVelocity)
   end
 
-  if self.state == "jump" then
+  if self.state == "jumping" then
     self.dy = -self.jumpVelocity
-    self.state = "fall"
+    self.state = "falling"
     return
   end
 
-  if self.state == "stand" then
+  if self.state == "standing" then
     if not ground then
-      self.state = "fall"
+      self.state = "falling"
       return
     end
 
     if self.jumpInput then
-      self.state = "jump"
+      self.state = "jumping"
       return
     end
 
     if inputX ~= 0 then
-      self.state = "walk"
+      self.state = "walking"
       return
     end
 
@@ -128,24 +128,29 @@ function Character:update(dt)
     end
   end
 
-  if self.state == "walk" then
+  if self.state == "walking" then
     if not ground then
-      self.state = "fall"
+      self.state = "falling"
       return
     end
 
     if self.jumpInput then
-      self.state = "jump"
+      self.state = "jumping"
       return
     end
 
     if inputX == 0 then
-      self.state = "stand"
+      self.state = "standing"
       return
     end
 
     self.dx = self.dx + inputX * self.walkAcceleration * dt
     self.dx = common.clamp(self.dx, -self.maxWalkVelocity, self.maxWalkVelocity)
+  end
+
+  if self.fire then
+    self.fire.x = self.x
+    self.fire.y = self.y - 0.5 * self.height - 0.5 * self.width
   end
 end
 
