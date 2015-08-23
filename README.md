@@ -18,7 +18,7 @@ Requires LÖVE 0.9.2 [2] to play.
 - Music generated with Otomata [3].
 - Sounds generated with as3sfxr [4].
 
-[1] http://ludumdare.com/compo/2015/08/19/welcome-to-ludum-dare-33/
-[2] https://love2d.org/
-[3] http://www.earslap.com/page/otomata.html
-[4] http://www.superflashbros.net/as3sfxr/
+[1] http://ludumdare.com/compo/2015/08/19/welcome-to-ludum-dare-33/  
+[2] https://love2d.org/  
+[3] http://www.earslap.com/page/otomata.html  
+[4] http://www.superflashbros.net/as3sfxr/  
