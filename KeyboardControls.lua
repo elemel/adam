@@ -30,6 +30,8 @@ function KeyboardControls:update(dt)
   local character = game.names.adam
 
   if character then
+    character.oldThrowInput = character.throwInput
+
     character.leftInput = getInput("left")
     character.rightInput = getInput("right")
 

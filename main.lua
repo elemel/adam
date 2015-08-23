@@ -1,3 +1,4 @@
+local Background = require "Background"
 local Character = require "Character"
 local common = require "common"
 local Fire = require "Fire"
@@ -7,9 +8,10 @@ local TrackingShot = require "TrackingShot"
 local VictorAi = require "VictorAi"
 
 function love.load()
-  love.window.setMode(0, 0, {
-    fullscreen = true,
+  love.window.setMode(800, 600, {
+    -- fullscreen = true,
     fullscreentype = "desktop",
+    resizable = true,
   })
 
   game = {
@@ -37,7 +39,7 @@ function love.load()
       right = {"d", "right"},
 
       jump = {" "},
-      throw = {"lshift"},
+      throw = {"lshift", "rshift"},
     },
 
     updates = {
@@ -48,11 +50,14 @@ function love.load()
     },
 
     draws = {
+      background = {},
       scene = {},
       particles = {},
     },
 
-    images = {},
+    images = {
+      mountains = love.graphics.newImage("resources/images/mountains.png"),
+    },
 
     skins = {
       adam = {
@@ -63,11 +68,32 @@ function love.load()
           },
 
           upper = {
-            love.graphics.newImage("resources/images/skins/adam/upper/holding.png"),
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
           },
         },
 
-        jumping = {
+        grabbed = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
+          },
+        },
+
+        grabbing = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/standing.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
+          },
+        },
+
+        holding = {
           lower = {
             love.graphics.newImage("resources/images/skins/adam/lower/standing.png"),
           },
@@ -77,7 +103,39 @@ function love.load()
           },
         },
 
+        jumping = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
+          },
+        },
+
+        spinning = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
+          },
+        },
+
         standing = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/standing.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
+          },
+        },
+
+        throwing = {
           lower = {
             love.graphics.newImage("resources/images/skins/adam/lower/standing.png"),
           },
@@ -142,6 +200,7 @@ function love.load()
   Terrain.new()
   Character.new({
     name = "adam",
+    y = -1.5,
     skin = game.skins.adam,
     color = {common.toByteColor(0.5, 1, 0, 1)},
   })
@@ -150,23 +209,28 @@ function love.load()
     name = "victor",
     skin = game.skins.adam,
     x = -2,
+    y = -1.5,
+    walkAcceleration = 4,
+    maxWalkVelocity = 2,
     color = {common.toByteColor(0, 0.75, 1, 1)},
   })
 
-  for i = 1, 8 do
+  for i = 1, 16 do
     local villager = Character.new({
       tags = {"villager"},
       skin = game.skins.adam,
       x = 4 + 8 * love.math.random(),
+      y = -1.5,
       color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},
     })
 
     villager.fire = Fire.new({
       x = villager.x,
-      y = villager.y,
+      y = villager.y - 1.5,
     })
   end
 
+  Background.new()
   KeyboardControls.new()
   TrackingShot.new()
   VictorAi.new()
@@ -192,7 +256,7 @@ function love.draw()
   love.graphics.scale(game.camera.scale * height)
   love.graphics.translate(-game.camera.x, -game.camera.y)
 
-  for i, phase in ipairs({"scene", "particles"}) do
+  for i, phase in ipairs({"background", "scene", "particles"}) do
     for entity, handler in pairs(game.draws[phase]) do
       handler(entity, dt)
     end

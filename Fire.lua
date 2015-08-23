@@ -10,7 +10,7 @@ function Fire.new(args)
   fire.x = args.x or 0
   fire.y = args.y or 0
 
-  fire.particles = love.graphics.newParticleSystem(game.images.ball, 16)
+  fire.particles = love.graphics.newParticleSystem(game.images.ball, 32)
   fire.particles:setPosition(fire.x, fire.y)
   fire.particles:setEmissionRate(32)
   fire.particles:setParticleLifetime(0.5)
