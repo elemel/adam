@@ -69,7 +69,7 @@ function love.load()
       throw = love.audio.newSource("resources/sounds/throw.ogg", "static"),
     },
 
-    music = love.audio.newSource("resources/music2.ogg"),
+    music = love.audio.newSource("resources/music.ogg"),
 
     skins = {
       adam = {
