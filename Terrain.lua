@@ -35,7 +35,7 @@ end
 function Terrain:draw()
   love.graphics.setColor(255, 255, 255, 255)
   for block, _ in pairs(self.blocks) do
-    love.graphics.rectangle("fill", block.x - 0.5 * block.width, block.y - 0.5 * block.height, block.width, block.height)
+    -- love.graphics.rectangle("fill", block.x - 0.5 * block.width, block.y - 0.5 * block.height, block.width, block.height)
   end
 end
 

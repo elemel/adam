@@ -59,7 +59,17 @@ function love.load()
 
     images = {
       background = love.graphics.newImage("resources/images/background.png"),
+      foreground = love.graphics.newImage("resources/images/foreground.png"),
     },
+
+    sounds = {
+      grab = love.audio.newSource("resources/sounds/grab.ogg", "static"),
+      jump = love.audio.newSource("resources/sounds/jump.ogg", "static"),
+      land = love.audio.newSource("resources/sounds/land.ogg", "static"),
+      throw = love.audio.newSource("resources/sounds/throw.ogg", "static"),
+    },
+
+    music = love.audio.newSource("resources/music2.ogg"),
 
     skins = {
       adam = {
@@ -109,6 +119,16 @@ function love.load()
           lower = {
             love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
             love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+          },
+
+          upper = {
+            love.graphics.newImage("resources/images/skins/adam/upper/standing.png"),
+          },
+        },
+
+        landing = {
+          lower = {
+            love.graphics.newImage("resources/images/skins/adam/lower/standing.png"),
           },
 
           upper = {
@@ -202,7 +222,7 @@ function love.load()
   Terrain.new()
   Character.new({
     name = "adam",
-    y = -1.5,
+    y = -1,
     skin = game.skins.adam,
     color = {common.toByteColor(0.5, 1, 0, 1)},
   })
@@ -211,7 +231,7 @@ function love.load()
     name = "victor",
     skin = game.skins.adam,
     x = -2,
-    y = -1.5,
+    y = -1,
     walkAcceleration = 4,
     maxWalkVelocity = 2,
     color = {common.toByteColor(0, 0.75, 1, 1)},
@@ -222,7 +242,7 @@ function love.load()
       tags = {"villager"},
       skin = game.skins.adam,
       x = 4 + 16 * love.math.random(),
-      y = -1.5,
+      y = -1,
       color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},
     })
 
@@ -236,6 +256,9 @@ function love.load()
   KeyboardControls.new()
   TrackingShot.new()
   VictorAi.new()
+
+  game.music:setLooping(true)
+  game.music:play()
 end
 
 function love.update(dt)

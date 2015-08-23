@@ -124,7 +124,7 @@ function Character:update(dt)
 
   if self.lowerState == "falling" then
     if ground then
-      self.lowerState = "standing"
+      self.lowerState = "landing"
       return
     end
 
@@ -134,7 +134,14 @@ function Character:update(dt)
 
   if self.lowerState == "jumping" then
     self.dy = -self.jumpVelocity
+    game.sounds.jump:clone():play()
     self.lowerState = "falling"
+    return
+  end
+
+  if self.lowerState == "landing" then
+    game.sounds.land:clone():play()
+    self.lowerState = "standing"
     return
   end
 
@@ -219,6 +226,9 @@ function Character:update(dt)
       self.captive.lowerState = "grabbed"
       self.captive.captor = self
       self.upperState = "holding"
+
+      game.sounds.grab:clone():play()
+
       return
     end
 
@@ -241,6 +251,8 @@ function Character:update(dt)
     self.captive.lowerState = "spinning"
     self.captive.captor = nil
     self.captive = nil
+
+    game.sounds.throw:clone():play()
 
     self.upperState = nil
     return
