@@ -11,8 +11,11 @@ function Background.new(args)
 end
 
 function Background:draw()
-  love.graphics.setColor(127, 127, 127, 255)
-  love.graphics.draw(game.images.mountains, 0.5 * game.camera.x, -6, 0, 1 / 8, 1 / 8)
+  love.graphics.setColor(255, 255, 255, 255)
+
+  local image = game.images.background
+  local width, height = image:getDimensions()
+  love.graphics.draw(image, 0.5 * game.camera.x, 0.5 * game.camera.y - 4, 0, 1 / 8, 1 / 8, 0.5 * width, 0.5 * height)
 end
 
 return Background

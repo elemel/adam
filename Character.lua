@@ -236,7 +236,7 @@ function Character:update(dt)
   if self.upperState == "throwing" then
     self.captive.dx = self.dx + self.direction * self.throwVelocityX
     self.captive.dy = self.dy - self.throwVelocityY
-    self.captive.dAngle = -math.pi * self.direction
+    self.captive.dAngle = -math.pi * self.direction * (0.5 + love.math.random())
 
     self.captive.lowerState = "spinning"
     self.captive.captor = nil

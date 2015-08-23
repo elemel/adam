@@ -8,6 +8,8 @@ local TrackingShot = require "TrackingShot"
 local VictorAi = require "VictorAi"
 
 function love.load()
+  love.window.setTitle("Adam")
+
   love.window.setMode(800, 600, {
     -- fullscreen = true,
     fullscreentype = "desktop",
@@ -21,7 +23,7 @@ function love.load()
 
     camera = {
       x = 0,
-      y = -3,
+      y = -4,
       scale = 1 / 16,
     },
 
@@ -56,7 +58,7 @@ function love.load()
     },
 
     images = {
-      mountains = love.graphics.newImage("resources/images/mountains.png"),
+      background = love.graphics.newImage("resources/images/background.png"),
     },
 
     skins = {
@@ -219,7 +221,7 @@ function love.load()
     local villager = Character.new({
       tags = {"villager"},
       skin = game.skins.adam,
-      x = 4 + 8 * love.math.random(),
+      x = 4 + 16 * love.math.random(),
       y = -1.5,
       color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},
     })

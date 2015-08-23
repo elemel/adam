@@ -11,9 +11,9 @@ function Terrain.new(args)
 
   local block = {
     x = 0,
-    y = 0,
+    y = 0.5,
 
-    width = 32,
+    width = 256,
     height = 1,
   }
 
