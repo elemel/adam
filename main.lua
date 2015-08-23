@@ -6,6 +6,7 @@ local KeyboardControls = require "KeyboardControls"
 local Terrain = require "Terrain"
 local TrackingShot = require "TrackingShot"
 local VictorAi = require "VictorAi"
+local VillagerAi = require "VillagerAi"
 
 function love.load()
   love.window.setTitle("Adam")
@@ -63,6 +64,7 @@ function love.load()
     },
 
     sounds = {
+      collide = love.audio.newSource("resources/sounds/collide.ogg", "static"),
       grab = love.audio.newSource("resources/sounds/grab.ogg", "static"),
       jump = love.audio.newSource("resources/sounds/jump.ogg", "static"),
       land = love.audio.newSource("resources/sounds/land.ogg", "static"),
@@ -241,8 +243,10 @@ function love.load()
     local villager = Character.new({
       tags = {"villager"},
       skin = game.skins.adam,
-      x = 4 + 16 * love.math.random(),
+      x = 16 + 16 * love.math.random(),
       y = -1,
+      walkAcceleration = 2,
+      maxWalkVelocity = 1,
       color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},
     })
 
@@ -256,6 +260,7 @@ function love.load()
   KeyboardControls.new()
   TrackingShot.new()
   VictorAi.new()
+  VillagerAi.new()
 
   game.music:setLooping(true)
   game.music:play()

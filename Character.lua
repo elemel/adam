@@ -37,8 +37,9 @@ function Character.new(args)
   character.fallAcceleration = 10
   character.maxFallVelocity = 10
   character.maxGrabDistance = 2
-  character.throwVelocityX = 4
-  character.throwVelocityY = 2
+
+  character.throwVelocityX = 6
+  character.throwVelocityY = 0
 
   character.upInput = false
   character.leftInput = false
@@ -64,6 +65,9 @@ function Character.new(args)
   character.upperAnimation = Animation.new({
     images = character.skin.standing.upper,
   })
+
+  character.aiDelay = 0
+  character.thrown = false
 
   game.updates.physics[character] = Character.update
   game.updates.animation[character] = Character.updateAnimation
@@ -169,6 +173,31 @@ function Character:update(dt)
   end
 
   if self.lowerState == "spinning" then
+    if self.thrown then
+      local function squaredDistance(villager)
+        return common.squaredDistance(self.x, self.y, villager.x, villager.y)
+      end
+
+      local villagers = common.filter(common.keys(game.tags.villager),
+        function(villager)
+          return (villager.lowerState ~= "grabbed" and
+            villager.lowerState ~= "spinning" and
+            squaredDistance(villager) < self.width ^ 2)
+        end)
+
+      if #villagers >= 1 then
+        local villager = villagers[love.math.random(1, #villagers)]
+        villager.dx = villager.dx + 0.25 * self.dx
+        villager.dAngle = -math.pi * (2 * love.math.random(0, 1) - 1) * (1 + love.math.random())
+        villager.lowerState = "spinning"
+
+        self.thrown = false
+        self.dx = self.dx - 0.25 * self.dx
+
+        game.sounds.collide:clone():play()
+      end
+    end
+
     self.dy = self.dy + self.fallAcceleration * dt
     self.dy = math.min(self.dy, self.maxFallVelocity)
     self.angle = self.angle + self.dAngle * dt
@@ -246,9 +275,10 @@ function Character:update(dt)
   if self.upperState == "throwing" then
     self.captive.dx = self.dx + self.direction * self.throwVelocityX
     self.captive.dy = self.dy - self.throwVelocityY
-    self.captive.dAngle = -math.pi * self.direction * (0.5 + love.math.random())
+    self.captive.dAngle = -math.pi * self.direction * (1 + love.math.random())
 
     self.captive.lowerState = "spinning"
+    self.captive.thrown = true
     self.captive.captor = nil
     self.captive = nil
 

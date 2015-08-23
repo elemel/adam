@@ -26,11 +26,16 @@ function VictorAi:update(dt)
     local victor = game.names.victor
 
     if victor then
-      if adam then
-        local inputX = love.math.random(-1, 1)
-        victor.leftInput = (inputX == -1)
-        victor.rightInput = (inputX == 1)
+      local inputX
+
+      if adam and math.abs(adam.x - victor.x) > 2 then
+        inputX = common.sign(adam.x - victor.x)
+      else
+        inputX = love.math.random(-1, 1)
       end
+
+      victor.leftInput = (inputX == -1)
+      victor.rightInput = (inputX == 1)
     end
 
     self.delay = 0.5 + 0.5 * math.random()
