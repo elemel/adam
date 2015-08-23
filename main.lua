@@ -10,6 +10,7 @@ local VillagerAi = require "VillagerAi"
 
 function love.load()
   love.window.setTitle("Adam")
+  love.filesystem.setIdentity("adam");
 
   love.window.setMode(800, 600, {
     -- fullscreen = true,
@@ -290,5 +291,12 @@ function love.draw()
     for entity, handler in pairs(game.draws[phase]) do
       handler(entity, dt)
     end
+  end
+end
+
+function love.keypressed(key, isrepeat)
+  if key == "return" and not isrepeat then
+    local screenshot = love.graphics.newScreenshot()
+    screenshot:encode("screenshot.png")
   end
 end
