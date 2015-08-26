@@ -73,12 +73,23 @@ local function filter(t, f)
   return result
 end
 
+local function dot(x1, y1, x2, y2)
+  return x1 * x2 + y1 * y2
+end
+
+local function normalize(x, y)
+  local length = math.sqrt(x ^ 2 + y ^ 2)
+  return x / length, y / length, length
+end
+
 return {
   clamp = clamp,
   distance = distance,
+  dot = dot,
   get2 = get2,
   filter = filter,
   keys = keys,
+  normalize = normalize,
   set2 = set2,
   sign = sign,
   squaredDistance = squaredDistance,

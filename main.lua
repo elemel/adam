@@ -3,6 +3,7 @@ local Character = require "Character"
 local common = require "common"
 local Fire = require "Fire"
 local KeyboardControls = require "KeyboardControls"
+local Lightning = require "Lightning"
 local Terrain = require "Terrain"
 local TrackingShot = require "TrackingShot"
 local VictorAi = require "VictorAi"
@@ -43,7 +44,7 @@ function love.load()
       right = {"d", "right"},
 
       jump = {" "},
-      throw = {"lshift", "rshift"},
+      throw = {"j", "lshift", "rshift"},
     },
 
     updates = {
@@ -262,6 +263,7 @@ function love.load()
   TrackingShot.new()
   VictorAi.new()
   VillagerAi.new()
+  Lightning.new({x1 = 0, y1 = -8, x2 = 0, y2 = 0})
 
   game.music:setLooping(true)
   game.music:play()

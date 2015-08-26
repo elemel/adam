@@ -37,7 +37,7 @@ function Fire.new(args)
 end
 
 function Fire:destroy()
-  game.draws.particles[fire] = nil
+  game.draws.particles[self] = nil
   game.updates.physics[self] = nil
 end
 
