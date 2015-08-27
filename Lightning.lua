@@ -13,14 +13,15 @@ function Lightning.new(args)
   lightning.x2 = args.x2 or 0
   lightning.y2 = args.y2 or 0
 
-  lightning.minTtl = 1 / 8
-  lightning.maxTtl = 1 / 2
+  lightning.maxLength = args.maxLength or 1
+  lightning.maxSlope = args.maxSlope or 1
+  lightning.maxWidth = args.maxWidth or 1
 
-  lightning.density = args.density or 1
-  lightning.width = args.width or 1
+  lightning.minTtl = 3 / 32
+  lightning.maxTtl = 3 / 16
 
-  lightning.particles = {}
-  lightning.vertices = {}
+  lightning.vertices = {lightning.x1, lightning.y1, lightning.x2, lightning.y2}
+  lightning.ttls = {}
 
   game.updates.physics[lightning] = Lightning.update
   game.draws.particles[lightning] = Lightning.draw
@@ -34,65 +35,78 @@ function Lightning:destroy()
 end
 
 function Lightning:update(dt)
-  self:updateParticles(dt)
-  self:updateVertices(dt)
-end
+  local adam = game.names.adam
 
-function Lightning:updateParticles(dt)
-  local tangentX, tangentY, length = common.normalize(
-    self.x2 - self.x1, self.y2 - self.y1)
-  local normalX, normalY = -tangentY, tangentX
+  if adam then
+    self.x1 = adam.x
 
-  local size = math.floor(self.density * length)
-
-  while #self.particles > size do
-    table.remove(self.particles)
+    self.x2 = adam.x - 0.25 * adam.direction
+    self.y2 = adam.y - 0.75
   end
 
-  while #self.particles < size do
-    table.insert(self.particles, {x = 0, y = 0, ttl = -1})
-  end
+  self.vertices[1] = self.x1
+  self.vertices[2] = self.y1
 
-  for i, particle in pairs(self.particles) do
-    particle.ttl = particle.ttl - dt
+  self.vertices[#self.vertices - 1] = self.x2
+  self.vertices[#self.vertices] = self.y2
 
-    if particle.ttl < 0 then
-      local origin = love.math.random()
-      local offset = love.math.random()
+  local i = 1
 
-      local originX = self.x1 + origin * length * tangentX
-      local originY = self.y1 + origin * length * tangentY
+  while i <= #self.ttls do
+    self.ttls[i] = self.ttls[i] - dt
 
-      local offsetX = (2 * offset - 1) * self.width * normalX
-      local offsetY = (2 * offset - 1) * self.width * normalY
+    if self.ttls[i] < 0 then
+      table.remove(self.vertices, 2 * i + 1)
+      table.remove(self.vertices, 2 * i + 1)
 
-      particle.x = originX + offsetX 
-      particle.y = originY + offsetY
-
-      particle.ttl = self.minTtl + love.math.random() * (self.maxTtl - self.minTtl)
+      table.remove(self.ttls, i)
+    else
+      i = i + 1
     end
   end
 
-  table.sort(self.particles, function(a, b)
-    return common.dot(a.x, a.y, tangentX, tangentY) < common.dot(b.x, b.y, tangentX, tangentY)
-  end)
-end
+  local j = 1
 
-function Lightning:updateVertices(dt)
-  self.vertices = {}
+  while j <= #self.ttls + 1 do
+    local x1 = self.vertices[2 * j - 1]
+    local y1 = self.vertices[2 * j]
 
-  table.insert(self.vertices, self.x1)
-  table.insert(self.vertices, self.y1)
+    local x2 = self.vertices[2 * j + 1]
+    local y2 = self.vertices[2 * j + 2]
 
-  for i, particle in ipairs(self.particles) do
-    if particle.ttl > 0 then
-      table.insert(self.vertices, particle.x)
-      table.insert(self.vertices, particle.y)
+    if (x2 - x1) ^ 2 + (y2 - y1) ^ 2 > self.maxLength ^ 2 then
+      local length = math.sqrt((x2 - x1) ^ 2 + (y2 - y1) ^ 2)
+
+      local tangentX = (x2 - x1) / length
+      local tangentY = (y2 - y1) / length
+
+      local normalX, normalY = -tangentY, tangentX
+
+      local originFraction = 0.25 + 0.5 * love.math.random()
+
+      local originX = common.mix(x1, x2, originFraction)
+      local originY = common.mix(y1, y2, originFraction)
+
+      local maxOffset = self.maxSlope * math.min(originFraction, 1 - originFraction) * length
+      local offsetScale = 2 * love.math.random() - 1
+      local offset = offsetScale * maxOffset
+
+      local offsetX = offset * normalX
+      local offsetY = offset * normalY
+
+      local x = originX + offsetX
+      local y = originY + offsetY
+
+      local ttl = common.mix(self.minTtl, self.maxTtl, love.math.random())
+
+      table.insert(self.vertices, 2 * j + 1, x)
+      table.insert(self.vertices, 2 * j + 2, y)
+
+      table.insert(self.ttls, j, ttl)
+    else
+      j = j + 1
     end
   end
-
-  table.insert(self.vertices, self.x2)
-  table.insert(self.vertices, self.y2)
 end
 
 function Lightning:draw(dt)
