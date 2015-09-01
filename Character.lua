@@ -1,8 +1,55 @@
 local Animation = require "Animation"
+local BoneForest = require "BoneForest"
 local common = require "common"
 
 local Character = {}
 Character.__index = Character
+
+local function newCharacterSkeleton(args)
+  local skeleton = {}
+
+  args = args or {}
+  local scale = args.scale or 1
+
+  local forest = BoneForest.new()
+  local boneIds = {}
+
+  boneIds.root = forest:add(args.x or 0, args.y or 0)
+  boneIds.neck = forest:add(0, scale * -0.3)
+  boneIds.head = forest:add(0, scale * -0.15)
+  boneIds.leftShoulder = forest:add(scale * -0.15, scale * -0.3, 0.125 * math.pi)
+  boneIds.leftElbow = forest:add(0, scale * 0.45, -0.125 * math.pi)
+  boneIds.leftWrist = forest:add(0, scale * 0.45)
+  boneIds.rightShoulder = forest:add(scale * 0.15, scale * -0.3, -0.125 * math.pi)
+  boneIds.rightElbow = forest:add(0, scale * 0.45, -0.125 * math.pi)
+  boneIds.rightWrist = forest:add(0, scale * 0.45)
+  boneIds.leftHip = forest:add(scale * -0.15, scale * 0.3)
+  boneIds.leftKnee = forest:add(0, scale * 0.45, 0.125 * math.pi)
+  boneIds.leftAnkle = forest:add(0, scale * 0.45)
+  boneIds.rightHip = forest:add(scale * 0.15, scale * 0.3, -0.125 * math.pi)
+  boneIds.rightKnee = forest:add(0, scale * 0.45, 0.125 * math.pi)
+  boneIds.rightAnkle = forest:add(0, scale * 0.45)
+
+  forest:setParent(boneIds.neck, boneIds.root)
+  forest:setParent(boneIds.head, boneIds.neck)
+  forest:setParent(boneIds.leftShoulder, boneIds.root)
+  forest:setParent(boneIds.leftElbow, boneIds.leftShoulder)
+  forest:setParent(boneIds.leftWrist, boneIds.leftElbow)
+  forest:setParent(boneIds.rightShoulder, boneIds.root)
+  forest:setParent(boneIds.rightElbow, boneIds.rightShoulder)
+  forest:setParent(boneIds.rightWrist, boneIds.rightElbow)
+  forest:setParent(boneIds.leftHip, boneIds.root)
+  forest:setParent(boneIds.leftKnee, boneIds.leftHip)
+  forest:setParent(boneIds.leftAnkle, boneIds.leftKnee)
+  forest:setParent(boneIds.rightHip, boneIds.root)
+  forest:setParent(boneIds.rightKnee, boneIds.rightHip)
+  forest:setParent(boneIds.rightAnkle, boneIds.rightKnee)
+
+  skeleton.forest = forest
+  skeleton.boneIds = boneIds
+
+  return skeleton
+end
 
 function Character.new(args)
   local character = {}
@@ -23,8 +70,8 @@ function Character.new(args)
 
   character.dAngle = 0
 
-  character.height = 2
-  character.width = 1
+  character.width = args.width or 1
+  character.height = args.height or 2
 
   character.direction = 1
 
@@ -68,6 +115,8 @@ function Character.new(args)
 
   character.aiDelay = 0
   character.thrown = false
+
+  character.skeleton = newCharacterSkeleton({scale = character.height / 1.8})
 
   game.updates.physics[character] = Character.update
   game.updates.animation[character] = Character.updateAnimation
@@ -335,26 +384,33 @@ function Character:updateAnimation(dt)
       self.captive.angle = 0.5 * math.pi
     end
   end
+
+  local rootId = self.skeleton.boneIds.root
+  local rootTransform = self.skeleton.forest.transforms[rootId]
+  rootTransform:reset()
+  rootTransform:translate(self.x, self.y - 0.3 * self.height / 1.8)
+  rootTransform:rotate(self.angle)
+  rootTransform:scale(self.direction, 1)
+  self.skeleton.forest:setDirty(rootId)
 end
 
 function Character:draw()
   love.graphics.setColor(self.color)
 
-  local grabber
-
-  love.graphics.push()
-  love.graphics.translate(self.x, self.y)
-  love.graphics.rotate(self.angle)
+  local scale = 0.3 / 4
 
   local lowerImage = self.lowerAnimation.images[self.lowerAnimation.index]
   local lowerWidth, lowerHeight = lowerImage:getDimensions()
-  love.graphics.draw(lowerImage, 0, 0, 0, self.direction / 8, 1 / 8, 0.5 * lowerWidth, 0.5 * lowerHeight)
+  love.graphics.draw(lowerImage, self.x, self.y, self.angle, self.direction * scale, scale, 0.5 * lowerWidth, 0.5 * lowerHeight)
 
   local upperImage = self.upperAnimation.images[self.upperAnimation.index]
   local upperWidth, upperHeight = upperImage:getDimensions()
-  love.graphics.draw(upperImage, 0, 0, 0, self.direction / 8, 1 / 8, 0.5 * upperWidth, 0.5 * upperHeight)
+  love.graphics.draw(upperImage, self.x, self.y, self.angle, self.direction * scale, scale, 0.5 * upperWidth, 0.5 * upperHeight)
 
-  love.graphics.pop()
+  -- love.graphics.rectangle("line", self.x - 0.5 * self.width, self.y - 0.5 * self.height, self.width, self.height)
+
+  love.graphics.setColor(0x00, 0xff, 0x00, 0xff)
+  self.skeleton.forest:debugDraw()
 end
 
 return Character

@@ -81,6 +81,8 @@ function love.load()
           lower = {
             love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
             love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/3.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/4.png"),
           },
 
           upper = {
@@ -92,6 +94,8 @@ function love.load()
           lower = {
             love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
             love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/3.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/4.png"),
           },
 
           upper = {
@@ -123,6 +127,8 @@ function love.load()
           lower = {
             love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
             love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/3.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/4.png"),
           },
 
           upper = {
@@ -144,6 +150,8 @@ function love.load()
           lower = {
             love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
             love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/3.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/4.png"),
           },
 
           upper = {
@@ -175,6 +183,8 @@ function love.load()
           lower = {
             love.graphics.newImage("resources/images/skins/adam/lower/walking/1.png"),
             love.graphics.newImage("resources/images/skins/adam/lower/walking/2.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/3.png"),
+            love.graphics.newImage("resources/images/skins/adam/lower/walking/4.png"),
           },
 
           upper = {
@@ -226,16 +236,20 @@ function love.load()
   Terrain.new()
   Character.new({
     name = "adam",
-    y = -1,
+    width = 1.2,
+    height = 2.4,
+    x = 0,
+    y = -1.2,
     skin = game.skins.adam,
-    color = {common.toByteColor(0.5, 1, 0, 1)},
   })
 
   Character.new({
     name = "victor",
     skin = game.skins.adam,
+    width = 0.9,
+    height = 1.8,
     x = -2,
-    y = -1,
+    y = -0.9,
     walkAcceleration = 4,
     maxWalkVelocity = 2,
     color = {common.toByteColor(0, 0.75, 1, 1)},
@@ -245,8 +259,10 @@ function love.load()
     local villager = Character.new({
       tags = {"villager"},
       skin = game.skins.adam,
+      width = 0.9,
+      height = 1.8,
       x = 16 + 16 * love.math.random(),
-      y = -1,
+      y = -0.9,
       walkAcceleration = 2,
       maxWalkVelocity = 1,
       color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},

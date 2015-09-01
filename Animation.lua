@@ -7,7 +7,7 @@ function Animation.new(args)
 
   animation.images = args.images or {}
   animation.index = 1
-  animation.delay = 0.25
+  animation.delay = 3 / 16
 
   return animation
 end
@@ -17,7 +17,7 @@ function Animation:update(dt)
 
   if self.delay < 0 then
     self.index = (self.index % #self.images) + 1
-    self.delay = 0.25
+    self.delay = 3 / 16
   end
 end
 
