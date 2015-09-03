@@ -1,10 +1,10 @@
 local Background = require "Background"
-local BoneForest = require "BoneForest"
 local Character = require "Character"
 local common = require "common"
 local Fire = require "Fire"
 local KeyboardControls = require "KeyboardControls"
 local Lightning = require "Lightning"
+local SceneGraph = require "SceneGraph"
 local Terrain = require "Terrain"
 local TrackingShot = require "TrackingShot"
 local VictorAi = require "VictorAi"
@@ -64,6 +64,16 @@ function love.load()
     images = {
       background = love.graphics.newImage("resources/images/background.png"),
       foreground = love.graphics.newImage("resources/images/foreground.png"),
+
+      adamBody = love.graphics.newImage("resources/images/adamBody.png"),
+      adamLeftUpperArm = love.graphics.newImage("resources/images/adamLeftUpperArm.png"),
+      adamLeftLowerArm = love.graphics.newImage("resources/images/adamLeftLowerArm.png"),
+      adamRightUpperArm = love.graphics.newImage("resources/images/adamRightUpperArm.png"),
+      adamRightLowerArm = love.graphics.newImage("resources/images/adamRightLowerArm.png"),
+      adamLeftUpperLeg = love.graphics.newImage("resources/images/adamLeftUpperLeg.png"),
+      adamLeftLowerLeg = love.graphics.newImage("resources/images/adamLeftLowerLeg.png"),
+      adamRightUpperLeg = love.graphics.newImage("resources/images/adamRightUpperLeg.png"),
+      adamRightLowerLeg = love.graphics.newImage("resources/images/adamRightLowerLeg.png"),
     },
 
     sounds = {
@@ -195,8 +205,12 @@ function love.load()
       },
     },
 
-    boneForest = BoneForest.new(),
+    sceneGraph = SceneGraph.new(),
   }
+
+  local shaderSource = love.filesystem.read("resources/shaders/shader.glsl")
+  game.shader = love.graphics.newShader(shaderSource, shaderSource)
+
 
   local pixelData = love.image.newImageData(1, 1)
   pixelData:setPixel(0, 0, 255, 255, 255, 255)
@@ -300,6 +314,8 @@ function love.update(dt)
 
     game.dt = 0
   end
+
+  game.sceneGraph:updateWorldTransforms()
 end
 
 function love.draw()
@@ -314,8 +330,9 @@ function love.draw()
     end
   end
 
+  love.graphics.setLineWidth(1 / 32)
   love.graphics.setColor(0x00, 0xff, 0x00, 0xff)
-  game.boneForest:debugDraw()
+  game.sceneGraph:debugDraw()
 end
 
 function love.keypressed(key, isrepeat)

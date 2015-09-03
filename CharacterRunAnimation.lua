@@ -23,13 +23,13 @@ function CharacterRunAnimation:update(dt)
     return 0.5 + 0.5 * math.sin(2 * math.pi * (f * self.time - t0))
   end
 
-  local rootBone = self.skeleton.bones.root
+  local backBone = self.skeleton.bones.back
 
-  self.skeleton.bones.root:set(
-    rootBone.x,
-    rootBone.y - 0.3 * math.abs(phase(0) - 0.5),
-    rootBone.r,
-    rootBone.sx)
+  backBone:set(
+    backBone.x,
+    backBone.y - 0.3 * math.abs(phase(0) - 0.5),
+    backBone.r,
+    backBone.sx)
 
   self.skeleton.bones.leftShoulder:setAngle(math.pi * common.mix(-0.25, 0.25, phase(0.5)))
   self.skeleton.bones.rightShoulder:setAngle(math.pi * common.mix(-0.25, 0.25, phase(0)))

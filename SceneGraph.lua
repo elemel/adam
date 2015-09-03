@@ -1,25 +1,29 @@
+local SceneNode = require "SceneNode"
+
 local Transform = require "Transform"
 
-local BoneForest = {}
-BoneForest.__index = BoneForest
+local SceneGraph = {}
+SceneGraph.__index = SceneGraph
 
-function BoneForest.new()
-  local forest = {}
-  setmetatable(forest, BoneForest)
+function SceneGraph.new()
+  local graph = {}
+  setmetatable(graph, SceneGraph)
 
-  forest.transforms = {}
-  forest.worldTransforms = {}
+  graph.transforms = {}
+  graph.worldTransforms = {}
 
-  forest.parents = {}
-  forest.children = {}
+  graph.parents = {}
+  graph.children = {}
 
-  forest.dirty = {}
-  forest.free = {}
+  graph.dirty = {}
+  graph.free = {}
 
-  return forest
+  graph.root = SceneNode.new(graph)
+
+  return graph
 end
 
-function BoneForest:add(x, y, r, sx, sy, ox, oy, kx, ky)
+function SceneGraph:add(x, y, r, sx, sy, ox, oy, kx, ky)
   local id = next(self.free)
 
   if id then
@@ -36,7 +40,7 @@ function BoneForest:add(x, y, r, sx, sy, ox, oy, kx, ky)
   return id
 end
 
-function BoneForest:remove(id)
+function SceneGraph:remove(id)
   self:setParent(id, nil)
   local children = self.children[id]
 
@@ -53,7 +57,7 @@ function BoneForest:remove(id)
   self.free[id] = true
 end
 
-function BoneForest:set(id, x, y, r, sx, sy, ox, oy, kx, ky)
+function SceneGraph:set(id, x, y, r, sx, sy, ox, oy, kx, ky)
   local transform = self.transforms[id]
   transform:set()
 
@@ -74,13 +78,13 @@ function BoneForest:set(id, x, y, r, sx, sy, ox, oy, kx, ky)
   end
 
   if ox or oy then
-    transform:translate(-ox or 0. -oy or 0)
+    transform:translate(-(ox or 0), -(oy or 0))
   end
 
   self:setDirty(id)
 end
 
-function BoneForest:setParent(id, parentId)
+function SceneGraph:setParent(id, parentId)
   local oldParentId = self.parents[id]
 
   if parentId ~= oldParentId then
@@ -98,7 +102,7 @@ function BoneForest:setParent(id, parentId)
   end
 end
 
-function BoneForest:setDirty(id)
+function SceneGraph:setDirty(id)
   if not self.dirty[id] then
     for childId, _ in pairs(self.children[id]) do
       self:setDirty(childId)
@@ -108,7 +112,7 @@ function BoneForest:setDirty(id)
   end
 end
 
-function BoneForest:updateWorldTransform(id)
+function SceneGraph:updateWorldTransform(id)
   if self.dirty[id] then
     local transform = self.worldTransforms[id]
     transform:set(self.transforms[id]:get())
@@ -124,7 +128,7 @@ function BoneForest:updateWorldTransform(id)
   end
 end
 
-function BoneForest:updateWorldTransforms()
+function SceneGraph:updateWorldTransforms()
   while true do
     local id = next(self.dirty)
 
@@ -136,7 +140,7 @@ function BoneForest:updateWorldTransforms()
   end
 end
 
-function BoneForest:debugDraw()
+function SceneGraph:debugDraw()
   self:updateWorldTransforms()
 
   for parentId, childIds in pairs(self.children) do
@@ -151,4 +155,4 @@ function BoneForest:debugDraw()
   end
 end
 
-return BoneForest
+return SceneGraph

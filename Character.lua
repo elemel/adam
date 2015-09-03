@@ -1,6 +1,7 @@
 local Animation = require "Animation"
 local CharacterRunAnimation = require "CharacterRunAnimation"
 local CharacterSkeleton = require "CharacterSkeleton"
+local CharacterSkin = require "CharacterSkin"
 local common = require "common"
 
 local Character = {}
@@ -71,8 +72,9 @@ function Character.new(args)
   character.aiDelay = 0
   character.thrown = false
 
-  character.skeleton = CharacterSkeleton.new({height = character.height, forest = game.boneForest})
+  character.skeleton = CharacterSkeleton.new({height = character.height})
   character.animation = CharacterRunAnimation.new({skeleton = character.skeleton})
+  character.skin2 = CharacterSkin.new({skeleton = character.skeleton})
 
   game.updates.physics[character] = Character.update
   game.updates.animation[character] = Character.updateAnimation
@@ -341,7 +343,7 @@ function Character:updateAnimation(dt)
     end
   end
 
-  self.skeleton.bones.root:set(
+  self.skeleton.bones.back:set(
     self.x,
     self.y - 0.3 * self.height / 1.8,
     self.angle,
@@ -352,16 +354,7 @@ end
 
 function Character:draw()
   love.graphics.setColor(self.color)
-
-  local scale = 0.3 / 4
-
-  local lowerImage = self.lowerAnimation.images[self.lowerAnimation.index]
-  local lowerWidth, lowerHeight = lowerImage:getDimensions()
-  love.graphics.draw(lowerImage, self.x, self.y, self.angle, self.direction * scale, scale, 0.5 * lowerWidth, 0.5 * lowerHeight)
-
-  local upperImage = self.upperAnimation.images[self.upperAnimation.index]
-  local upperWidth, upperHeight = upperImage:getDimensions()
-  love.graphics.draw(upperImage, self.x, self.y, self.angle, self.direction * scale, scale, 0.5 * upperWidth, 0.5 * upperHeight)
+  self.skin2:draw()
 
   -- love.graphics.rectangle("line", self.x - 0.5 * self.width, self.y - 0.5 * self.height, self.width, self.height)
 end

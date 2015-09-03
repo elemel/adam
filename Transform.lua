@@ -114,6 +114,13 @@ function Transform:invert()
         invDeterminant * (-self.a * self.f + self.c * self.d))
 end
 
+function Transform:decompose()
+    local x1, y1 = self:transformPoint(0, 0)
+    local x2, y2 = self:transformVector(1, 0)
+    local r = math.atan2(y2, x2)
+    return x, y, r, 1, 1
+end
+
 function Transform:toMatrix()
     return {
         {self.a, self.b, self.c},

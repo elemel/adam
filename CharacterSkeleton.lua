@@ -1,6 +1,3 @@
-local Bone = require "Bone"
-local BoneForest = require "BoneForest"
-
 local CharacterSkeleton = {}
 CharacterSkeleton.__index = CharacterSkeleton
 
@@ -13,32 +10,30 @@ function CharacterSkeleton.new(args)
   skeleton.height = args.height or 1.8
   local scale = skeleton.height / 1.8
 
-  local forest = args.forest or BoneForest.new()
   local bones = {}
 
-  bones.root = Bone.newRoot(forest, args.x or 0, args.y or 0)
+  bones.back = game.sceneGraph.root:newChild(args.x or 0, args.y or 0)
 
-  bones.neck = Bone.newChild(bones.root, 0, scale * -0.3)
-  bones.head = Bone.newChild(bones.neck, 0, scale * -0.15)
+  bones.neck = bones.back:newChild(0, scale * -0.3)
+  bones.head = bones.neck:newChild(0, scale * -0.15)
 
-  bones.leftShoulder = Bone.newChild(bones.root, scale * -0.15, scale * -0.3, 0.125 * math.pi)
-  bones.leftElbow = Bone.newChild(bones.leftShoulder, 0, scale * 0.45, -0.125 * math.pi)
-  bones.leftWrist = Bone.newChild(bones.leftElbow, 0, scale * 0.45)
+  bones.leftShoulder = bones.back:newChild(scale * -0.15, scale * -0.3, 0.125 * math.pi)
+  bones.leftElbow = bones.leftShoulder:newChild(0, scale * 0.45, -0.125 * math.pi)
+  bones.leftWrist = bones.leftElbow:newChild(0, scale * 0.45)
 
-  bones.rightShoulder = Bone.newChild(bones.root, scale * 0.15, scale * -0.3, -0.125 * math.pi)
-  bones.rightElbow = Bone.newChild(bones.rightShoulder, 0, scale * 0.45, -0.125 * math.pi)
-  bones.rightWrist = Bone.newChild(bones.rightElbow, 0, scale * 0.45)
+  bones.rightShoulder = bones.back:newChild(scale * 0.15, scale * -0.3, -0.125 * math.pi)
+  bones.rightElbow = bones.rightShoulder:newChild(0, scale * 0.45, -0.125 * math.pi)
+  bones.rightWrist = bones.rightElbow:newChild(0, scale * 0.45)
 
-  bones.leftHip = Bone.newChild(bones.root, scale * -0.15, scale * 0.3)
-  bones.leftKnee = Bone.newChild(bones.leftHip, 0, scale * 0.45, 0.125 * math.pi)
-  bones.leftAnkle = Bone.newChild(bones.leftKnee, 0, scale * 0.45)
+  bones.leftHip = bones.back:newChild(scale * -0.15, scale * 0.3)
+  bones.leftKnee = bones.leftHip:newChild(0, scale * 0.45, 0.125 * math.pi)
+  bones.leftAnkle = bones.leftKnee:newChild(0, scale * 0.45)
 
-  bones.rightHip = Bone.newChild(bones.root, scale * 0.15, scale * 0.3, -0.125 * math.pi)
-  bones.rightKnee = Bone.newChild(bones.rightHip, 0, scale * 0.45, 0.125 * math.pi)
-  bones.rightAnkle = Bone.newChild(bones.rightKnee, 0, scale * 0.45)
+  bones.rightHip = bones.back:newChild(scale * 0.15, scale * 0.3, -0.125 * math.pi)
+  bones.rightKnee = bones.rightHip:newChild(0, scale * 0.45, 0.125 * math.pi)
+  bones.rightAnkle = bones.rightKnee:newChild(0, scale * 0.45)
 
   skeleton.bones = bones
-  skeleton.forest = forest
 
   return skeleton
 end
