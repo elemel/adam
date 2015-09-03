@@ -19,7 +19,7 @@ function Transform:get()
     return self.a, self.b, self.c, self.d, self.e, self.f
 end
 
-function Transform:reset(a, b, c, d, e, f)
+function Transform:set(a, b, c, d, e, f)
     self.a = a or 1
     self.b = b or 0
     self.c = c or 0
@@ -29,7 +29,7 @@ function Transform:reset(a, b, c, d, e, f)
 end
 
 function Transform:multiply(a, b, c, d, e, f)
-    self:reset(
+    self:set(
         self.a * a + self.b * d,
         self.a * b + self.b * e,
         self.a * c + self.b * f + self.c,
@@ -39,7 +39,7 @@ function Transform:multiply(a, b, c, d, e, f)
 end
 
 function Transform:multiplyRight(a, b, c, d, e, f)
-    self:reset(
+    self:set(
         a * self.a + b * self.d,
         a * self.b + b * self.e,
         a * self.c + b * self.f + c,
@@ -105,7 +105,7 @@ end
 
 function Transform:invert()
     local invDeterminant = 1 / (self.a * self.e - self.b * self.d)
-    self:reset(
+    self:set(
         invDeterminant * self.e,
         invDeterminant * -self.b,
         invDeterminant * (self.b * self.f - self.c * self.e),

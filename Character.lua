@@ -1,55 +1,10 @@
 local Animation = require "Animation"
-local BoneForest = require "BoneForest"
+local CharacterRunAnimation = require "CharacterRunAnimation"
+local CharacterSkeleton = require "CharacterSkeleton"
 local common = require "common"
 
 local Character = {}
 Character.__index = Character
-
-local function newCharacterSkeleton(args)
-  local skeleton = {}
-
-  args = args or {}
-  local scale = args.scale or 1
-
-  local forest = BoneForest.new()
-  local boneIds = {}
-
-  boneIds.root = forest:add(args.x or 0, args.y or 0)
-  boneIds.neck = forest:add(0, scale * -0.3)
-  boneIds.head = forest:add(0, scale * -0.15)
-  boneIds.leftShoulder = forest:add(scale * -0.15, scale * -0.3, 0.125 * math.pi)
-  boneIds.leftElbow = forest:add(0, scale * 0.45, -0.125 * math.pi)
-  boneIds.leftWrist = forest:add(0, scale * 0.45)
-  boneIds.rightShoulder = forest:add(scale * 0.15, scale * -0.3, -0.125 * math.pi)
-  boneIds.rightElbow = forest:add(0, scale * 0.45, -0.125 * math.pi)
-  boneIds.rightWrist = forest:add(0, scale * 0.45)
-  boneIds.leftHip = forest:add(scale * -0.15, scale * 0.3)
-  boneIds.leftKnee = forest:add(0, scale * 0.45, 0.125 * math.pi)
-  boneIds.leftAnkle = forest:add(0, scale * 0.45)
-  boneIds.rightHip = forest:add(scale * 0.15, scale * 0.3, -0.125 * math.pi)
-  boneIds.rightKnee = forest:add(0, scale * 0.45, 0.125 * math.pi)
-  boneIds.rightAnkle = forest:add(0, scale * 0.45)
-
-  forest:setParent(boneIds.neck, boneIds.root)
-  forest:setParent(boneIds.head, boneIds.neck)
-  forest:setParent(boneIds.leftShoulder, boneIds.root)
-  forest:setParent(boneIds.leftElbow, boneIds.leftShoulder)
-  forest:setParent(boneIds.leftWrist, boneIds.leftElbow)
-  forest:setParent(boneIds.rightShoulder, boneIds.root)
-  forest:setParent(boneIds.rightElbow, boneIds.rightShoulder)
-  forest:setParent(boneIds.rightWrist, boneIds.rightElbow)
-  forest:setParent(boneIds.leftHip, boneIds.root)
-  forest:setParent(boneIds.leftKnee, boneIds.leftHip)
-  forest:setParent(boneIds.leftAnkle, boneIds.leftKnee)
-  forest:setParent(boneIds.rightHip, boneIds.root)
-  forest:setParent(boneIds.rightKnee, boneIds.rightHip)
-  forest:setParent(boneIds.rightAnkle, boneIds.rightKnee)
-
-  skeleton.forest = forest
-  skeleton.boneIds = boneIds
-
-  return skeleton
-end
 
 function Character.new(args)
   local character = {}
@@ -116,7 +71,8 @@ function Character.new(args)
   character.aiDelay = 0
   character.thrown = false
 
-  character.skeleton = newCharacterSkeleton({scale = character.height / 1.8})
+  character.skeleton = CharacterSkeleton.new({height = character.height, forest = game.boneForest})
+  character.animation = CharacterRunAnimation.new({skeleton = character.skeleton})
 
   game.updates.physics[character] = Character.update
   game.updates.animation[character] = Character.updateAnimation
@@ -385,13 +341,13 @@ function Character:updateAnimation(dt)
     end
   end
 
-  local rootId = self.skeleton.boneIds.root
-  local rootTransform = self.skeleton.forest.transforms[rootId]
-  rootTransform:reset()
-  rootTransform:translate(self.x, self.y - 0.3 * self.height / 1.8)
-  rootTransform:rotate(self.angle)
-  rootTransform:scale(self.direction, 1)
-  self.skeleton.forest:setDirty(rootId)
+  self.skeleton.bones.root:set(
+    self.x,
+    self.y - 0.3 * self.height / 1.8,
+    self.angle,
+    self.direction)
+
+  self.animation:update(dt)
 end
 
 function Character:draw()
@@ -408,9 +364,6 @@ function Character:draw()
   love.graphics.draw(upperImage, self.x, self.y, self.angle, self.direction * scale, scale, 0.5 * upperWidth, 0.5 * upperHeight)
 
   -- love.graphics.rectangle("line", self.x - 0.5 * self.width, self.y - 0.5 * self.height, self.width, self.height)
-
-  love.graphics.setColor(0x00, 0xff, 0x00, 0xff)
-  self.skeleton.forest:debugDraw()
 end
 
 return Character

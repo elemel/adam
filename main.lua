@@ -1,4 +1,5 @@
 local Background = require "Background"
+local BoneForest = require "BoneForest"
 local Character = require "Character"
 local common = require "common"
 local Fire = require "Fire"
@@ -192,7 +193,9 @@ function love.load()
           },
         },
       },
-    }
+    },
+
+    boneForest = BoneForest.new(),
   }
 
   local pixelData = love.image.newImageData(1, 1)
@@ -310,6 +313,9 @@ function love.draw()
       handler(entity, dt)
     end
   end
+
+  love.graphics.setColor(0x00, 0xff, 0x00, 0xff)
+  game.boneForest:debugDraw()
 end
 
 function love.keypressed(key, isrepeat)

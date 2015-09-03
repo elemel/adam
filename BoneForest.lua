@@ -14,22 +14,48 @@ function BoneForest.new()
   forest.children = {}
 
   forest.dirty = {}
+  forest.free = {}
 
   return forest
 end
 
 function BoneForest:add(x, y, r, sx, sy, ox, oy, kx, ky)
-  table.insert(self.transforms, Transform.new())
-  table.insert(self.worldTransforms, Transform.new())
-  table.insert(self.children, {})
+  local id = next(self.free)
 
-  local id = #self.transforms
+  if id then
+    self.free[id] = nil
+  else
+    table.insert(self.transforms, Transform.new())
+    table.insert(self.worldTransforms, Transform.new())
+    table.insert(self.children, {})
+
+    id = #self.transforms
+  end
+
   self:set(id, x, y, r, sx, sy, ox, oy, kx, ky)
   return id
 end
 
+function BoneForest:remove(id)
+  self:setParent(id, nil)
+  local children = self.children[id]
+
+  while true do
+    local childId = next(children)
+
+    if not childId then
+      break
+    end
+
+    self:setParent(childId, nil)
+  end
+
+  self.free[id] = true
+end
+
 function BoneForest:set(id, x, y, r, sx, sy, ox, oy, kx, ky)
   local transform = self.transforms[id]
+  transform:set()
 
   if x or y then
     transform:translate(x or 0, y or 0)
@@ -85,7 +111,7 @@ end
 function BoneForest:updateWorldTransform(id)
   if self.dirty[id] then
     local transform = self.worldTransforms[id]
-    transform:reset(self.transforms[id]:get())
+    transform:set(self.transforms[id]:get())
     local parentId = self.parents[id]
 
     if parentId then
