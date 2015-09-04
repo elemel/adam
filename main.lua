@@ -66,6 +66,7 @@ function love.load()
       foreground = love.graphics.newImage("resources/images/foreground.png"),
 
       adamBody = love.graphics.newImage("resources/images/adamBody.png"),
+      adamHead = love.graphics.newImage("resources/images/adamHead.png"),
       adamLeftUpperArm = love.graphics.newImage("resources/images/adamLeftUpperArm.png"),
       adamLeftLowerArm = love.graphics.newImage("resources/images/adamLeftLowerArm.png"),
       adamRightUpperArm = love.graphics.newImage("resources/images/adamRightUpperArm.png"),
@@ -332,7 +333,7 @@ function love.draw()
 
   love.graphics.setLineWidth(1 / 32)
   love.graphics.setColor(0x00, 0xff, 0x00, 0xff)
-  game.sceneGraph:debugDraw()
+  -- game.sceneGraph:debugDraw()
 end
 
 function love.keypressed(key, isrepeat)

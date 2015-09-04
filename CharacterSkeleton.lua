@@ -14,8 +14,7 @@ function CharacterSkeleton.new(args)
 
   bones.back = game.sceneGraph.root:newChild(args.x or 0, args.y or 0)
 
-  bones.neck = bones.back:newChild(0, scale * -0.3)
-  bones.head = bones.neck:newChild(0, scale * -0.15)
+  bones.neck = bones.back:newChild(0, scale * -0.45)
 
   bones.leftShoulder = bones.back:newChild(scale * -0.15, scale * -0.3, 0.125 * math.pi)
   bones.leftElbow = bones.leftShoulder:newChild(0, scale * 0.45, -0.125 * math.pi)

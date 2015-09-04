@@ -12,7 +12,9 @@ function CharacterSkin.new(args)
   local scale = skin.skeleton.height / 1.8
   local pixelScale = 0.3 / 4
 
-  skin.nodes.body = skin.skeleton.bones.back:newChild(0, 0, 0, pixelScale, pixelScale, 8, 8)
+  skin.nodes.body = skin.skeleton.bones.back:newChild(0, 0, 0, pixelScale, pixelScale, 16, 16)
+
+  skin.nodes.head = skin.skeleton.bones.neck:newChild(0, 0, 0, pixelScale, pixelScale, 8, 8)
 
   skin.nodes.leftUpperArm = skin.skeleton.bones.leftShoulder:newChild(0, scale * 0.225, 0, pixelScale, pixelScale, 8, 8)
   skin.nodes.leftLowerArm = skin.skeleton.bones.leftElbow:newChild(0, scale * 0.225, 0, pixelScale, pixelScale, 8, 8)
@@ -51,6 +53,10 @@ function CharacterSkin:draw()
   local bodyTransform = game.sceneGraph.worldTransforms[self.nodes.body.id]
   game.shader:send("vertexTransformation", bodyTransform:toTransposedMatrix4())
   love.graphics.draw(game.images.adamBody)
+
+  local headTransform = game.sceneGraph.worldTransforms[self.nodes.head.id]
+  game.shader:send("vertexTransformation", headTransform:toTransposedMatrix4())
+  love.graphics.draw(game.images.adamHead)
 
   local leftUpperLegTransform = game.sceneGraph.worldTransforms[self.nodes.leftUpperLeg.id]
   game.shader:send("vertexTransformation", leftUpperLegTransform:toTransposedMatrix4())
