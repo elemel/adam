@@ -350,6 +350,14 @@ function Character:updateAnimation(dt)
     self.direction)
 
   self.animation:update(dt)
+
+  if self.captive then
+    self.skeleton.bones.leftShoulder:setAngle(1.125 * math.pi)
+    self.skeleton.bones.rightShoulder:setAngle(1.125 * math.pi)
+
+    self.skeleton.bones.leftElbow:setAngle(-0.25 * math.pi)
+    self.skeleton.bones.rightElbow:setAngle(-0.25 * math.pi)
+  end
 end
 
 function Character:draw()

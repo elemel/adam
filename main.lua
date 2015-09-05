@@ -297,7 +297,7 @@ function love.load()
   TrackingShot.new()
   VictorAi.new()
   VillagerAi.new()
-  Lightning.new({x1 = 0, y1 = -16, x2 = 0, y2 = 0})
+  -- Lightning.new({x1 = 0, y1 = -16, x2 = 0, y2 = 0})
 
   game.music:setLooping(true)
   game.music:play()
