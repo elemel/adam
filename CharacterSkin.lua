@@ -14,13 +14,13 @@ function CharacterSkin.new(args)
 
   skin.nodes.body = skin.skeleton.bones.back:newChild(0, 0, 0, pixelScale, pixelScale, 16, 16)
 
-  skin.nodes.head = skin.skeleton.bones.neck:newChild(0, 0, 0, pixelScale, pixelScale, 8, 8)
+  skin.nodes.head = skin.skeleton.bones.neck:newChild(0, scale * -0.15, 0, pixelScale, pixelScale, 8, 8)
 
-  skin.nodes.leftUpperArm = skin.skeleton.bones.leftShoulder:newChild(0, scale * 0.225, 0, pixelScale, pixelScale, 8, 8)
-  skin.nodes.leftLowerArm = skin.skeleton.bones.leftElbow:newChild(0, scale * 0.225, 0, pixelScale, pixelScale, 8, 8)
+  skin.nodes.leftUpperArm = skin.skeleton.bones.leftShoulder:newChild(0, scale * 0.15, 0, pixelScale, pixelScale, 8, 8)
+  skin.nodes.leftLowerArm = skin.skeleton.bones.leftElbow:newChild(0, scale * 0.15, 0, pixelScale, pixelScale, 8, 8)
 
-  skin.nodes.rightUpperArm = skin.skeleton.bones.rightShoulder:newChild(0, scale * 0.225, 0, pixelScale, pixelScale, 8, 8)
-  skin.nodes.rightLowerArm = skin.skeleton.bones.rightElbow:newChild(0, scale * 0.225, 0, pixelScale, pixelScale, 8, 8)
+  skin.nodes.rightUpperArm = skin.skeleton.bones.rightShoulder:newChild(0, scale * 0.15, 0, pixelScale, pixelScale, 8, 8)
+  skin.nodes.rightLowerArm = skin.skeleton.bones.rightElbow:newChild(0, scale * 0.15, 0, pixelScale, pixelScale, 8, 8)
 
   skin.nodes.leftUpperLeg = skin.skeleton.bones.leftHip:newChild(0, scale * 0.225, 0, pixelScale, pixelScale, 8, 8)
   skin.nodes.leftLowerLeg = skin.skeleton.bones.leftKnee:newChild(0, scale * 0.225, 0, pixelScale, pixelScale, 8, 8)
