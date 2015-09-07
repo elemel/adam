@@ -10,13 +10,13 @@ function VillagerAi.new(args)
   ai.minSpawnDistance = 16
   ai.maxSpawnDistance = 32
 
-  game.updates.input[ai] = VillagerAi.update
+  game.updates.controls[ai] = VillagerAi.update
 
   return terrain
 end
 
 function VillagerAi:destroy()
-  game.updates.input[self] = nil
+  game.updates.controls[self] = nil
 end
 
 function VillagerAi:update(dt)

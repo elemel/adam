@@ -15,13 +15,13 @@ function KeyboardControls.new(args)
   local controls = {}
   setmetatable(controls, KeyboardControls)
 
-  game.updates.input[controls] = KeyboardControls.update
+  game.updates.controls[controls] = KeyboardControls.update
 
   return controls
 end
 
 function KeyboardControls:destroy()
-  game.updates.input[self] = nil
+  game.updates.controls[self] = nil
 
   self.body:destroy()
 end

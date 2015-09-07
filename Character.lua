@@ -1,7 +1,8 @@
-local Animation = require "Animation"
-local CharacterRunAnimation = require "CharacterRunAnimation"
+local CharacterStandState = require "CharacterStandState"
 local CharacterSkeleton = require "CharacterSkeleton"
 local CharacterSkin = require "CharacterSkin"
+local CharacterStruggleState = require "CharacterStruggleState"
+local CharacterWalkState = require "CharacterWalkState"
 local common = require "common"
 
 local Character = {}
@@ -31,7 +32,7 @@ function Character.new(args)
 
   character.direction = 1
 
-  character.lowerState = "standing"
+  character.lowerState = CharacterStandState.new({character = character})
   character.upperState = nil
 
   character.walkAcceleration = args.walkAcceleration or 16
@@ -54,27 +55,16 @@ function Character.new(args)
 
   character.oldThrowInput = false
 
-  character.skin = args.skin or game.skins.adam
+  character.targetX = 0
+  character.targetY = 0
+
   character.color = args.color or {255, 255, 255, 255}
-
-  character.lowerAnimationState = "standing"
-
-  character.lowerAnimation = Animation.new({
-    images = character.skin.standing.lower,
-  })
-
-  character.upperAnimationState = "standing"
-
-  character.upperAnimation = Animation.new({
-    images = character.skin.standing.upper,
-  })
 
   character.aiDelay = 0
   character.thrown = false
 
   character.skeleton = CharacterSkeleton.new({height = character.height})
-  character.animation = CharacterRunAnimation.new({skeleton = character.skeleton})
-  character.skin2 = CharacterSkin.new({skeleton = character.skeleton})
+  character.skin = CharacterSkin.new({skeleton = character.skeleton})
 
   game.updates.physics[character] = Character.update
   game.updates.animation[character] = Character.updateAnimation
@@ -107,11 +97,30 @@ function Character:destroy()
   self.body:destroy()
 end
 
+function Character:setLowerState(state)
+  if self.lowerState then
+    self.lowerState:destroy()
+    self.lowerState = nil
+  end
+
+  if state == "stand" then
+    self.lowerState = CharacterStandState.new({character = self})
+  elseif state == "struggle" then
+    self.lowerState = CharacterStruggleState.new({character = self})
+  elseif state == "walk" then
+    self.lowerState = CharacterWalkState.new({character = self})
+  end
+end
+
 function Character:update(dt)
   local inputX = (self.rightInput and 1 or 0) - (self.leftInput and 1 or 0)
 
-  if inputX ~= 0 then
-    self.direction = inputX
+  if self.captive then
+    self.direction = common.sign(self.targetX - self.x)
+  else
+    if inputX ~= 0 then
+      self.direction = inputX
+    end
   end
 
   self.x = self.x + self.dx * dt
@@ -135,7 +144,6 @@ function Character:update(dt)
 
   if self.lowerState == "falling" then
     if ground then
-      self.lowerState = "landing"
       return
     end
 
@@ -146,29 +154,24 @@ function Character:update(dt)
   if self.lowerState == "jumping" then
     self.dy = -self.jumpVelocity
     game.sounds.jump:clone():play()
-    self.lowerState = "falling"
     return
   end
 
   if self.lowerState == "landing" then
     game.sounds.land:clone():play()
-    self.lowerState = "standing"
     return
   end
 
   if self.lowerState == "standing" then
     if not ground then
-      self.lowerState = "falling"
       return
     end
 
     if self.jumpInput then
-      self.lowerState = "jumping"
       return
     end
 
     if inputX ~= 0 then
-      self.lowerState = "walking"
       return
     end
 
@@ -196,7 +199,6 @@ function Character:update(dt)
         local villager = villagers[love.math.random(1, #villagers)]
         villager.dx = villager.dx + 0.25 * self.dx
         villager.dAngle = -math.pi * (2 * love.math.random(0, 1) - 1) * (1 + love.math.random())
-        villager.lowerState = "spinning"
 
         self.thrown = false
         self.dx = self.dx - 0.25 * self.dx
@@ -208,26 +210,6 @@ function Character:update(dt)
     self.dy = self.dy + self.fallAcceleration * dt
     self.dy = math.min(self.dy, self.maxFallVelocity)
     self.angle = self.angle + self.dAngle * dt
-  end
-
-  if self.lowerState == "walking" then
-    if not ground then
-      self.lowerState = "falling"
-      return
-    end
-
-    if self.jumpInput then
-      self.lowerState = "jumping"
-      return
-    end
-
-    if inputX == 0 then
-      self.lowerState = "standing"
-      return
-    end
-
-    self.dx = self.dx + inputX * self.walkAcceleration * dt
-    self.dx = common.clamp(self.dx, -self.maxWalkVelocity, self.maxWalkVelocity)
   end
 
   if self.upperState == nil then
@@ -259,8 +241,9 @@ function Character:update(dt)
         function(a, b) return squaredDistance(a) < squaredDistance(b) end)
 
       self.captive = villagers[1]
-      self.captive.lowerState = "grabbed"
       self.captive.captor = self
+      self.captive:setLowerState("struggle")
+      game.sceneGraph:setParent(self.captive.skeleton.bones.back.id, self.skeleton.bones.rightWrist.id)
       self.upperState = "holding"
 
       game.sounds.grab:clone():play()
@@ -284,7 +267,9 @@ function Character:update(dt)
     self.captive.dy = self.dy - self.throwVelocityY
     self.captive.dAngle = -math.pi * self.direction * (1 + love.math.random())
 
-    self.captive.lowerState = "spinning"
+    game.sceneGraph:setParent(self.captive.skeleton.bones.back.id, nil)
+    self.captive.x = self.x
+    self.captive.y = self.y
     self.captive.thrown = true
     self.captive.captor = nil
     self.captive = nil
@@ -297,27 +282,6 @@ function Character:update(dt)
 end
 
 function Character:updateAnimation(dt)
-  if self.lowerAnimationState ~= self.lowerState then
-    self.lowerAnimation = Animation.new({
-      images = self.skin[self.lowerState].lower,
-    })
-
-    self.lowerAnimationState = self.lowerState
-  end
-
-  local upperState = self.upperState or self.lowerState
-
-  if self.upperAnimationState ~= upperState then
-    self.upperAnimation = Animation.new({
-      images = self.skin[upperState].upper,
-    })
-
-    self.upperAnimationState = upperState
-  end
-
-  self.lowerAnimation:update(dt)
-  self.upperAnimation:update(dt)
-
   if self.fire then
     if self.captor or self.lowerState == "spinning" then
       self.fire.particles:setEmissionRate(64)
@@ -331,16 +295,11 @@ function Character:updateAnimation(dt)
   end
 
   if self.captive then
-    self.captive.x = self.x
-    self.captive.y = self.y - 0.5 * self.height - 0.5 * self.captive.width
+    self.captive.x = 0
+    self.captive.y = 0.3 * self.height / 1.8
 
-    if self.direction == 1 then
-      self.captive.direction = 1
-      self.captive.angle = -0.5 * math.pi
-    else
-      self.captive.direction = -1
-      self.captive.angle = 0.5 * math.pi
-    end
+    -- self.captive.direction = -1
+    self.captive.angle = 0.5 * math.pi
   end
 
   self.skeleton.bones.back:set(
@@ -352,17 +311,20 @@ function Character:updateAnimation(dt)
   self.animation:update(dt)
 
   if self.captive then
-    self.skeleton.bones.leftShoulder:setAngle(1.125 * math.pi)
-    self.skeleton.bones.rightShoulder:setAngle(1.125 * math.pi)
+    local scale = self.skeleton.height / 1.8
+    local angle = math.atan2(self.targetY - self.y + scale * 0.6, self.direction * (self.targetX - self.x))
 
-    self.skeleton.bones.leftElbow:setAngle(-0.25 * math.pi)
-    self.skeleton.bones.rightElbow:setAngle(-0.25 * math.pi)
+    self.skeleton.bones.leftShoulder:setAngle(angle - (0.5 - 0.0625) * math.pi)
+    self.skeleton.bones.rightShoulder:setAngle(angle - (0.5 - 0.0625) * math.pi)
+
+    self.skeleton.bones.leftElbow:setAngle(-0.125 * math.pi)
+    self.skeleton.bones.rightElbow:setAngle(-0.125 * math.pi)
   end
 end
 
 function Character:draw()
   love.graphics.setColor(self.color)
-  self.skin2:draw()
+  self.skin:draw()
 
   -- love.graphics.rectangle("line", self.x - 0.5 * self.width, self.y - 0.5 * self.height, self.width, self.height)
 end

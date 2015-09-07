@@ -4,6 +4,7 @@ local common = require "common"
 local Fire = require "Fire"
 local KeyboardControls = require "KeyboardControls"
 local Lightning = require "Lightning"
+local MouseControls = require "MouseControls"
 local SceneGraph = require "SceneGraph"
 local Terrain = require "Terrain"
 local TrackingShot = require "TrackingShot"
@@ -12,7 +13,8 @@ local VillagerAi = require "VillagerAi"
 
 function love.load()
   love.window.setTitle("Adam")
-  love.filesystem.setIdentity("adam");
+  love.filesystem.setIdentity("adam")
+  -- love.mouse.setVisible(false)
 
   love.window.setMode(800, 600, {
     -- fullscreen = true,
@@ -49,7 +51,7 @@ function love.load()
     },
 
     updates = {
-      input = {},
+      controls = {},
       physics = {},
       collision = {},
       animation = {},
@@ -59,6 +61,7 @@ function love.load()
       background = {},
       scene = {},
       particles = {},
+      debug = {},
     },
 
     images = {
@@ -293,11 +296,13 @@ function love.load()
   end
 
   Background.new()
-  KeyboardControls.new()
   TrackingShot.new()
   VictorAi.new()
   VillagerAi.new()
   -- Lightning.new({x1 = 0, y1 = -16, x2 = 0, y2 = 0})
+
+  KeyboardControls.new()
+  MouseControls.new()
 
   game.music:setLooping(true)
   game.music:play()
@@ -307,7 +312,7 @@ function love.update(dt)
   game.dt = math.min(game.dt + dt, game.maxDt)
 
   if game.dt > game.minDt then
-    for i, phase in ipairs({"input", "physics", "collision", "animation"}) do
+    for i, phase in ipairs({"controls", "physics", "collision", "animation"}) do
       for entity, handler in pairs(game.updates[phase]) do
         handler(entity, dt)
       end
@@ -325,7 +330,7 @@ function love.draw()
   love.graphics.scale(game.camera.scale * height)
   love.graphics.translate(-game.camera.x, -game.camera.y)
 
-  for i, phase in ipairs({"background", "scene", "particles"}) do
+  for i, phase in ipairs({"background", "scene", "particles", "debug"}) do
     for entity, handler in pairs(game.draws[phase]) do
       handler(entity, dt)
     end
