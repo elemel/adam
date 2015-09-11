@@ -1,3 +1,8 @@
+local CharacterFallState = require "CharacterFallState"
+local CharacterGrabState = require "CharacterGrabState"
+local CharacterIdleState = require "CharacterIdleState"
+local CharacterJumpState = require "CharacterJumpState"
+local CharacterLandState = require "CharacterLandState"
 local CharacterStandState = require "CharacterStandState"
 local CharacterSkeleton = require "CharacterSkeleton"
 local CharacterSkin = require "CharacterSkin"
@@ -31,9 +36,7 @@ function Character.new(args)
   character.height = args.height or 2
 
   character.direction = 1
-
-  character.lowerState = CharacterStandState.new({character = character})
-  character.upperState = nil
+  character.ground = true
 
   character.walkAcceleration = args.walkAcceleration or 16
   character.maxWalkVelocity = args.maxWalkVelocity or 4
@@ -51,9 +54,9 @@ function Character.new(args)
   character.rightInput = false
 
   character.jumpInput = false
-  character.throwInput = false
+  character.attackInput = false
 
-  character.oldThrowInput = false
+  character.oldAttackInput = false
 
   character.targetX = 0
   character.targetY = 0
@@ -78,6 +81,9 @@ function Character.new(args)
     game.names[character.name] = character
   end
 
+  character:setUpperState("idle")
+  character:setLowerState("stand")
+
   return character
 end
 
@@ -97,13 +103,32 @@ function Character:destroy()
   self.body:destroy()
 end
 
+function Character:setUpperState(state)
+  if self.upperState then
+    self.upperState:destroy()
+    self.upperState = nil
+  end
+
+  if state == "grab" then
+    self.upperState = CharacterGrabState.new({character = self})
+  elseif state == "idle" then
+    self.upperState = CharacterIdleState.new({character = self})
+  end
+end
+
 function Character:setLowerState(state)
   if self.lowerState then
     self.lowerState:destroy()
     self.lowerState = nil
   end
 
-  if state == "stand" then
+  if state == "fall" then
+    self.lowerState = CharacterFallState.new({character = self})
+  elseif state == "jump" then
+    self.lowerState = CharacterJumpState.new({character = self})
+  elseif state == "land" then
+    self.lowerState = CharacterLandState.new({character = self})
+  elseif state == "stand" then
     self.lowerState = CharacterStandState.new({character = self})
   elseif state == "struggle" then
     self.lowerState = CharacterStruggleState.new({character = self})
@@ -126,7 +151,7 @@ function Character:update(dt)
   self.x = self.x + self.dx * dt
   self.y = self.y + self.dy * dt
 
-  local ground = false
+  self.ground = false
 
   if self.lowerState ~= "spinning" then
     local terrain = game.names.terrain
@@ -137,7 +162,7 @@ function Character:update(dt)
           self.y + 0.5 * self.height + 0.001 > block.y - 0.5 * block.height then
         self.dy = 0
         self.y = block.y - 0.5 * block.height - 0.5 * self.height
-        ground = true
+        self.ground = true
       end
     end
   end
@@ -149,12 +174,6 @@ function Character:update(dt)
 
     self.dy = self.dy + self.fallAcceleration * dt
     self.dy = math.min(self.dy, self.maxFallVelocity)
-  end
-
-  if self.lowerState == "jumping" then
-    self.dy = -self.jumpVelocity
-    game.sounds.jump:clone():play()
-    return
   end
 
   if self.lowerState == "landing" then
@@ -213,7 +232,7 @@ function Character:update(dt)
   end
 
   if self.upperState == nil then
-    if self.throwInput and not self.oldThrowInput then
+    if self.attackInput and not self.oldAttackInput then
       if self.captive then
         self.upperState = "throwing"
         return
@@ -221,44 +240,6 @@ function Character:update(dt)
         self.upperState = "grabbing"
         return
       end
-    end
-  end
-
-  if self.upperState == "grabbing" then
-    local function squaredDistance(villager)
-      return common.squaredDistance(self.x, self.y, villager.x, villager.y)
-    end
-
-    local villagers = common.filter(common.keys(game.tags.villager),
-      function(villager)
-        return (villager.lowerState ~= "grabbed" and
-          villager.lowerState ~= "spinning" and
-          squaredDistance(villager) < self.maxGrabDistance ^ 2)
-      end)
-
-    if #villagers >= 1 then
-      table.sort(villagers,
-        function(a, b) return squaredDistance(a) < squaredDistance(b) end)
-
-      self.captive = villagers[1]
-      self.captive.captor = self
-      self.captive:setLowerState("struggle")
-      game.sceneGraph:setParent(self.captive.skeleton.bones.back.id, self.skeleton.bones.rightWrist.id)
-      self.upperState = "holding"
-
-      game.sounds.grab:clone():play()
-
-      return
-    end
-
-    self.upperState = nil
-    return
-  end
-
-  if self.upperState == "holding" then
-    if self.throwInput and not self.oldThrowInput then
-      self.upperState = "throwing"
-      return
     end
   end
 
@@ -272,6 +253,9 @@ function Character:update(dt)
     self.captive.y = self.y
     self.captive.thrown = true
     self.captive.captor = nil
+
+    self.captive:setLowerState("fall")
+
     self.captive = nil
 
     game.sounds.throw:clone():play()
@@ -296,9 +280,8 @@ function Character:updateAnimation(dt)
 
   if self.captive then
     self.captive.x = 0
-    self.captive.y = 0.3 * self.height / 1.8
+    self.captive.y = 0
 
-    -- self.captive.direction = -1
     self.captive.angle = 0.5 * math.pi
   end
 
@@ -308,7 +291,13 @@ function Character:updateAnimation(dt)
     self.angle,
     self.direction)
 
-  self.animation:update(dt)
+  if self.lowerAnimation then
+    self.lowerAnimation:update(dt)
+  end
+
+  if self.upperAnimation then
+    self.upperAnimation:update(dt)
+  end
 
   if self.captive then
     local scale = self.skeleton.height / 1.8

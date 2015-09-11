@@ -10,7 +10,7 @@ function CharacterWalkState.new(args)
 
   state.character = args.character
 
-  state.character.animation = CharacterRunAnimation.new({character = state.character})
+  state.character.lowerAnimation = CharacterRunAnimation.new({character = state.character})
 
   game.updates.physics[state] = CharacterWalkState.update
 
@@ -20,11 +20,21 @@ end
 function CharacterWalkState:destroy()
   game.updates.physics[self] = nil
 
-  self.character.animation = nil
+  self.character.lowerAnimation = nil
 end
 
 function CharacterWalkState:update(dt)
   local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
+
+  if not self.character.ground then
+    self.character:setLowerState("fall")
+    return
+  end
+
+  if self.character.jumpInput then
+    self.character:setLowerState("jump")
+    return
+  end
 
   if inputX == 0 then
     self.character:setLowerState("stand")

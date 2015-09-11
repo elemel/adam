@@ -30,13 +30,10 @@ function KeyboardControls:update(dt)
   local character = game.names.adam
 
   if character then
-    character.oldThrowInput = character.throwInput
-
     character.leftInput = getInput("left")
     character.rightInput = getInput("right")
 
     character.jumpInput = getInput("jump")
-    character.throwInput = getInput("throw")
   end
 end
 

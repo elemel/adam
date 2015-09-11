@@ -42,6 +42,9 @@ function MouseControls:update(dt)
   if character then
     character.targetX = self.x
     character.targetY = self.y
+
+    character.oldAttackInput = character.attackInput
+    character.attackInput = love.mouse.isDown("l")
   end
 end
 
