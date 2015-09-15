@@ -24,7 +24,10 @@ function CharacterGrabState:destroy()
 end
 
 function CharacterGrabState:update(dt)
-  game.sounds.grab:clone():play()
+  if not self.character.attackInput then
+    self.character:setUpperState("idle")
+    return
+  end
 
   local function squaredDistance(villager)
     return common.squaredDistance(self.character.x, self.character.y, villager.x, villager.y)
@@ -46,10 +49,10 @@ function CharacterGrabState:update(dt)
     self.character.captive:setLowerState("struggle")
     game.sceneGraph:setParent(self.character.captive.skeleton.bones.back.id, self.character.skeleton.bones.rightWrist.id)
     self.character:setUpperState("hold")
+
+    game.sounds.grab:clone():play()
     return
   end
-
-  self.character:setUpperState("idle")
 end
 
 return CharacterGrabState

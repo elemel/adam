@@ -1,5 +1,6 @@
 local CharacterFallState = require "CharacterFallState"
 local CharacterGrabState = require "CharacterGrabState"
+local CharacterHoldState = require "CharacterHoldState"
 local CharacterIdleState = require "CharacterIdleState"
 local CharacterJumpState = require "CharacterJumpState"
 local CharacterLandState = require "CharacterLandState"
@@ -7,6 +8,7 @@ local CharacterStandState = require "CharacterStandState"
 local CharacterSkeleton = require "CharacterSkeleton"
 local CharacterSkin = require "CharacterSkin"
 local CharacterStruggleState = require "CharacterStruggleState"
+local CharacterThrowState = require "CharacterThrowState"
 local CharacterWalkState = require "CharacterWalkState"
 local common = require "common"
 
@@ -45,8 +47,7 @@ function Character.new(args)
   character.maxFallVelocity = 10
   character.maxGrabDistance = 2
 
-  character.throwVelocityX = 6
-  character.throwVelocityY = 0
+  character.throwVelocity = 8
 
   character.upInput = false
   character.leftInput = false
@@ -111,8 +112,12 @@ function Character:setUpperState(state)
 
   if state == "grab" then
     self.upperState = CharacterGrabState.new({character = self})
+  elseif state == "hold" then
+    self.upperState = CharacterHoldState.new({character = self})
   elseif state == "idle" then
     self.upperState = CharacterIdleState.new({character = self})
+  elseif state == "throw" then
+    self.upperState = CharacterThrowState.new({character = self})
   end
 end
 
@@ -167,40 +172,6 @@ function Character:update(dt)
     end
   end
 
-  if self.lowerState == "falling" then
-    if ground then
-      return
-    end
-
-    self.dy = self.dy + self.fallAcceleration * dt
-    self.dy = math.min(self.dy, self.maxFallVelocity)
-  end
-
-  if self.lowerState == "landing" then
-    game.sounds.land:clone():play()
-    return
-  end
-
-  if self.lowerState == "standing" then
-    if not ground then
-      return
-    end
-
-    if self.jumpInput then
-      return
-    end
-
-    if inputX ~= 0 then
-      return
-    end
-
-    if math.abs(self.dx) < self.walkAcceleration * dt then
-      self.dx = 0
-    else
-      self.dx = self.dx - common.sign(self.dx) * self.walkAcceleration * dt
-    end
-  end
-
   if self.lowerState == "spinning" then
     if self.thrown then
       local function squaredDistance(villager)
@@ -230,39 +201,6 @@ function Character:update(dt)
     self.dy = math.min(self.dy, self.maxFallVelocity)
     self.angle = self.angle + self.dAngle * dt
   end
-
-  if self.upperState == nil then
-    if self.attackInput and not self.oldAttackInput then
-      if self.captive then
-        self.upperState = "throwing"
-        return
-      else
-        self.upperState = "grabbing"
-        return
-      end
-    end
-  end
-
-  if self.upperState == "throwing" then
-    self.captive.dx = self.dx + self.direction * self.throwVelocityX
-    self.captive.dy = self.dy - self.throwVelocityY
-    self.captive.dAngle = -math.pi * self.direction * (1 + love.math.random())
-
-    game.sceneGraph:setParent(self.captive.skeleton.bones.back.id, nil)
-    self.captive.x = self.x
-    self.captive.y = self.y
-    self.captive.thrown = true
-    self.captive.captor = nil
-
-    self.captive:setLowerState("fall")
-
-    self.captive = nil
-
-    game.sounds.throw:clone():play()
-
-    self.upperState = nil
-    return
-  end
 end
 
 function Character:updateAnimation(dt)
@@ -278,16 +216,9 @@ function Character:updateAnimation(dt)
     end
   end
 
-  if self.captive then
-    self.captive.x = 0
-    self.captive.y = 0
-
-    self.captive.angle = 0.5 * math.pi
-  end
-
   self.skeleton.bones.back:set(
     self.x,
-    self.y - 0.3 * self.height / 1.8,
+    self.y - 0.15 * self.height / 1.8,
     self.angle,
     self.direction)
 
@@ -297,17 +228,6 @@ function Character:updateAnimation(dt)
 
   if self.upperAnimation then
     self.upperAnimation:update(dt)
-  end
-
-  if self.captive then
-    local scale = self.skeleton.height / 1.8
-    local angle = math.atan2(self.targetY - self.y + scale * 0.6, self.direction * (self.targetX - self.x))
-
-    self.skeleton.bones.leftShoulder:setAngle(angle - (0.5 - 0.0625) * math.pi)
-    self.skeleton.bones.rightShoulder:setAngle(angle - (0.5 - 0.0625) * math.pi)
-
-    self.skeleton.bones.leftElbow:setAngle(-0.125 * math.pi)
-    self.skeleton.bones.rightElbow:setAngle(-0.125 * math.pi)
   end
 end
 

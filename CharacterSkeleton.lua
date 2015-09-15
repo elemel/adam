@@ -14,21 +14,21 @@ function CharacterSkeleton.new(args)
 
   bones.back = game.sceneGraph.root:newChild(args.x or 0, args.y or 0)
 
-  bones.neck = bones.back:newChild(0, scale * -0.45)
+  bones.neck = bones.back:newChild(0, scale * -0.6)
 
-  bones.leftShoulder = bones.back:newChild(scale * -0.15, scale * -0.3, 0.125 * math.pi)
+  bones.leftShoulder = bones.back:newChild(scale * -0.15, scale * -0.45, 0.125 * math.pi)
   bones.leftElbow = bones.leftShoulder:newChild(0, scale * 0.3, -0.125 * math.pi)
   bones.leftWrist = bones.leftElbow:newChild(0, scale * 0.3)
 
-  bones.rightShoulder = bones.back:newChild(scale * 0.15, scale * -0.3, -0.125 * math.pi)
+  bones.rightShoulder = bones.back:newChild(scale * 0.15, scale * -0.45, -0.125 * math.pi)
   bones.rightElbow = bones.rightShoulder:newChild(0, scale * 0.3, -0.125 * math.pi)
   bones.rightWrist = bones.rightElbow:newChild(0, scale * 0.3)
 
-  bones.leftHip = bones.back:newChild(scale * -0.15, scale * 0.3)
+  bones.leftHip = bones.back:newChild(scale * -0.15, scale * 0.15)
   bones.leftKnee = bones.leftHip:newChild(0, scale * 0.45, 0.125 * math.pi)
   bones.leftAnkle = bones.leftKnee:newChild(0, scale * 0.45)
 
-  bones.rightHip = bones.back:newChild(scale * 0.15, scale * 0.3, -0.125 * math.pi)
+  bones.rightHip = bones.back:newChild(scale * 0.15, scale * 0.15, -0.125 * math.pi)
   bones.rightKnee = bones.rightHip:newChild(0, scale * 0.45, 0.125 * math.pi)
   bones.rightAnkle = bones.rightKnee:newChild(0, scale * 0.45)
 

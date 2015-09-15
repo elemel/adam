@@ -14,18 +14,6 @@ function CharacterStandAnimation.new(args)
 end
 
 function CharacterStandAnimation:update(dt)
-  local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
-  local inputSign = common.sign(inputX)
-  self.fraction = self.fraction + inputSign * self.character.direction * dt
-
-  local function phase(t0, f)
-    t0 = t0 or 0
-    f = f or 1.375
-
-    return 0.5 + 0.5 * math.sin(2 * math.pi * (f * self.fraction - t0))
-  end
-
-  local scale = self.character.skeleton.height / 1.8
   local bones = self.character.skeleton.bones
 
   bones.back:set(

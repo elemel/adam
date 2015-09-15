@@ -12,6 +12,11 @@ function CharacterStruggleState.new(args)
 
   state.character.lowerAnimation = CharacterStruggleAnimation.new({character = state.character})
 
+  state.character.x = 0
+  state.character.y = 0
+  state.character.dx = 0
+  state.character.dy = 0
+
   game.updates.physics[state] = CharacterStruggleState.update
 
   return state
@@ -24,10 +29,6 @@ function CharacterStruggleState:destroy()
 end
 
 function CharacterStruggleState:update(dt)
-  self.character.x = 0
-  self.character.y = 0
-  self.character.dx = 0
-  self.character.dy = 0
 end
 
 return CharacterStruggleState

@@ -12,7 +12,7 @@ function CharacterSkin.new(args)
   local scale = skin.skeleton.height / 1.8
   local pixelScale = 0.3 / 4
 
-  skin.nodes.body = skin.skeleton.bones.back:newChild(0, 0, 0, pixelScale, pixelScale, 16, 16)
+  skin.nodes.body = skin.skeleton.bones.back:newChild(0, scale * -0.15, 0, pixelScale, pixelScale, 16, 16)
 
   skin.nodes.head = skin.skeleton.bones.neck:newChild(0, scale * -0.15, 0, pixelScale, pixelScale, 8, 8)
 
