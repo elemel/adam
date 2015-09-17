@@ -19,6 +19,12 @@ function Terrain.new(args)
 
   terrain.blocks[block] = true
 
+  local physics = game.names.physics
+  terrain.body = love.physics.newBody(physics.world)
+
+  local shape = love.physics.newRectangleShape(0, 0.5, 256, 1)
+  love.physics.newFixture(terrain.body, shape)
+
   game.draws.scene[terrain] = Terrain.draw
   game.names.terrain = terrain
 
@@ -34,6 +40,7 @@ end
 
 function Terrain:draw()
   love.graphics.setColor(255, 255, 255, 255)
+
   for block, _ in pairs(self.blocks) do
     -- love.graphics.rectangle("fill", block.x - 0.5 * block.width, block.y - 0.5 * block.height, block.width, block.height)
   end

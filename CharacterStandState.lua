@@ -12,13 +12,13 @@ function CharacterStandState.new(args)
 
   state.character.lowerAnimation = CharacterStandAnimation.new({character = state.character})
 
-  game.updates.physics[state] = CharacterStandState.update
+  game.updates.collision[state] = CharacterStandState.update
 
   return state
 end
 
 function CharacterStandState:destroy()
-  game.updates.physics[self] = nil
+  game.updates.collision[self] = nil
 
   self.character.lowerAnimation = nil
 end
@@ -26,7 +26,17 @@ end
 function CharacterStandState:update(dt)
   local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
 
-  if not self.character.ground then
+  self.character:updateFloorContact()
+  self.character:applyFloorFriction(self.character.walkAcceleration * dt)
+
+  self.character.dy = self.character.dy + self.character.fallAcceleration * dt
+
+  self.character.x = self.character.x + self.character.dx * dt
+  self.character.y = self.character.y + self.character.dy * dt
+
+  self.character:applyFloorConstraint()
+
+  if not self.character.floor then
     self.character:setLowerState("fall")
     return
   end
@@ -39,12 +49,6 @@ function CharacterStandState:update(dt)
   if inputX ~= 0 then
     self.character:setLowerState("walk")
     return
-  end
-
-  if math.abs(self.character.dx) < self.character.walkAcceleration * dt then
-    self.character.dx = 0
-  else
-    self.character.dx = self.character.dx - common.sign(self.character.dx) * self.character.walkAcceleration * dt
   end
 end
 

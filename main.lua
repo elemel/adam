@@ -1,10 +1,13 @@
 local Background = require "Background"
+local Ball = require "Ball"
 local Character = require "Character"
 local common = require "common"
 local Fire = require "Fire"
 local KeyboardControls = require "KeyboardControls"
 local Lightning = require "Lightning"
 local MouseControls = require "MouseControls"
+local Physics = require "Physics"
+local Platform = require "Platform"
 local SceneGraph = require "SceneGraph"
 local Terrain = require "Terrain"
 local TrackingShot = require "TrackingShot"
@@ -254,7 +257,24 @@ function love.load()
     end
   end
 
+  Physics.new()
   Terrain.new()
+
+  Platform.new({
+    y = -1,
+    width = 4,
+    height = 0.45,
+    angle = 0.125 * math.pi,
+  })
+
+  Ball.new({
+    x = 10,
+    y = -1.5,
+    width = 4,
+    height = 0.45,
+    radius = 1.5,
+  })
+
   Character.new({
     name = "adam",
     width = 1.2,
@@ -264,19 +284,19 @@ function love.load()
     skin = game.skins.adam,
   })
 
-  Character.new({
-    name = "victor",
-    skin = game.skins.adam,
-    width = 0.9,
-    height = 1.8,
-    x = -2,
-    y = -0.9,
-    walkAcceleration = 4,
-    maxWalkVelocity = 2,
-    color = {common.toByteColor(0, 0.75, 1, 1)},
-  })
+  -- Character.new({
+  --   name = "victor",
+  --   skin = game.skins.adam,
+  --   width = 0.9,
+  --   height = 1.8,
+  --   x = -2,
+  --   y = -0.9,
+  --   walkAcceleration = 4,
+  --   maxWalkVelocity = 2,
+  --   color = {common.toByteColor(0, 0.75, 1, 1)},
+  -- })
 
-  for i = 1, 16 do
+  for i = 1, 0 do
     local villager = Character.new({
       tags = {"villager"},
       skin = game.skins.adam,

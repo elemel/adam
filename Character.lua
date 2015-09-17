@@ -38,7 +38,7 @@ function Character.new(args)
   character.height = args.height or 2
 
   character.direction = 1
-  character.ground = true
+  character.floor = false
 
   character.walkAcceleration = args.walkAcceleration or 16
   character.maxWalkVelocity = args.maxWalkVelocity or 4
@@ -83,7 +83,7 @@ function Character.new(args)
   end
 
   character:setUpperState("idle")
-  character:setLowerState("stand")
+  character:setLowerState("fall")
 
   return character
 end
@@ -142,6 +142,67 @@ function Character:setLowerState(state)
   end
 end
 
+function Character:updateFloorContact()
+  local physics = game.names.physics
+  self.floor = false
+  local epsilon = 1 / 16
+
+  physics.world:rayCast(self.x, self.y, self.x, self.y + 0.5 * self.height + epsilon,
+    function(fixture, x, y, xn, yn, fraction)
+      local body = fixture:getBody()
+
+      self.floor = true
+
+      self.floorX = x
+      self.floorY = y
+
+      self.floorNormalX = xn
+      self.floorNormalY = yn
+
+      self.floorDx, self.floorDy = body:getLinearVelocityFromWorldPoint(x, y)
+
+      return fraction
+    end)
+end
+
+function Character:applyFloorFriction(friction)
+  if self.floor then
+    local floorTangentX = -self.floorNormalY
+    local floorTangentY = self.floorNormalX
+
+    local dx = self.dx - self.floorDx
+    local dy = self.dy - self.floorDy
+
+    local tv = common.dot(dx, dy, floorTangentX, floorTangentY)
+
+    if math.abs(tv) < friction then
+      self.dx = self.dx - tv * floorTangentX
+      self.dy = self.dy - tv * floorTangentY
+    else
+      self.dx = self.dx - common.sign(tv) * friction * floorTangentX
+      self.dy = self.dy - common.sign(tv) * friction * floorTangentY
+    end
+  end
+end
+
+function Character:applyFloorConstraint()
+  local physics = game.names.physics
+
+  if self.floor then
+    self.y = self.floorY - 0.5 * self.height
+
+    local dx = self.dx - self.floorDx
+    local dy = self.dy - self.floorDy
+
+    local nv = common.dot(dx, dy, self.floorNormalX, self.floorNormalY)
+
+    if nv < 0 then
+      self.dx = self.dx - nv * self.floorNormalX
+      self.dy = self.dy - nv * self.floorNormalY
+    end
+  end
+end
+
 function Character:update(dt)
   local inputX = (self.rightInput and 1 or 0) - (self.leftInput and 1 or 0)
 
@@ -150,25 +211,6 @@ function Character:update(dt)
   else
     if inputX ~= 0 then
       self.direction = inputX
-    end
-  end
-
-  self.x = self.x + self.dx * dt
-  self.y = self.y + self.dy * dt
-
-  self.ground = false
-
-  if self.lowerState ~= "spinning" then
-    local terrain = game.names.terrain
-
-    for block, _ in pairs(terrain.blocks) do
-      if self.x - 0.5 * self.width < block.x + 0.5 * block.width and
-          self.x + 0.5 * self.width > block.x - 0.5 * block.width and
-          self.y + 0.5 * self.height + 0.001 > block.y - 0.5 * block.height then
-        self.dy = 0
-        self.y = block.y - 0.5 * block.height - 0.5 * self.height
-        self.ground = true
-      end
     end
   end
 

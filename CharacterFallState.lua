@@ -12,25 +12,31 @@ function CharacterFallState.new(args)
 
   state.character.lowerAnimation = CharacterRunAnimation.new({character = state.character})
 
-  game.updates.physics[state] = CharacterFallState.update
+  game.updates.collision[state] = CharacterFallState.update
 
   return state
 end
 
 function CharacterFallState:destroy()
-  game.updates.physics[self] = nil
+  game.updates.collision[self] = nil
 
   self.character.lowerAnimation = nil
 end
 
 function CharacterFallState:update(dt)
-  if self.character.dy > -1 and self.character.ground then
+  self.character.dy = self.character.dy + self.character.fallAcceleration * dt
+  self.character.dy = math.min(self.character.dy, self.character.maxFallVelocity)
+
+  self.character.x = self.character.x + self.character.dx * dt
+  self.character.y = self.character.y + self.character.dy * dt
+
+  self.character:updateFloorContact()
+  self.character:applyFloorConstraint()
+
+  if self.character.floor then
     self.character:setLowerState("land")
     return
   end
-
-  self.character.dy = self.character.dy + self.character.fallAcceleration * dt
-  self.character.dy = math.min(self.character.dy, self.character.maxFallVelocity)
 end
 
 return CharacterFallState
