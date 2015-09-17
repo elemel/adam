@@ -10,6 +10,7 @@ local CharacterSkin = require "CharacterSkin"
 local CharacterStruggleState = require "CharacterStruggleState"
 local CharacterThrowState = require "CharacterThrowState"
 local CharacterWalkState = require "CharacterWalkState"
+local CharacterWallContact = require "CharacterWallContact"
 local common = require "common"
 
 local Character = {}
@@ -69,6 +70,14 @@ function Character.new(args)
 
   character.skeleton = CharacterSkeleton.new({height = character.height})
   character.skin = CharacterSkin.new({skeleton = character.skeleton})
+
+  character.contacts = {
+    floor = CharacterWallContact.new({
+      character = character,
+
+      y2 = 0.5 * character.height,
+    }),
+  }
 
   game.updates.physics[character] = Character.update
   game.updates.animation[character] = Character.updateAnimation
@@ -143,64 +152,15 @@ function Character:setLowerState(state)
 end
 
 function Character:updateFloorContact()
-  local physics = game.names.physics
-  self.floor = false
-  local epsilon = 1 / 16
-
-  physics.world:rayCast(self.x, self.y, self.x, self.y + 0.5 * self.height + epsilon,
-    function(fixture, x, y, xn, yn, fraction)
-      local body = fixture:getBody()
-
-      self.floor = true
-
-      self.floorX = x
-      self.floorY = y
-
-      self.floorNormalX = xn
-      self.floorNormalY = yn
-
-      self.floorDx, self.floorDy = body:getLinearVelocityFromWorldPoint(x, y)
-
-      return fraction
-    end)
+  self.contacts.floor:updateContact()
 end
 
 function Character:applyFloorFriction(friction)
-  if self.floor then
-    local floorTangentX = -self.floorNormalY
-    local floorTangentY = self.floorNormalX
-
-    local dx = self.dx - self.floorDx
-    local dy = self.dy - self.floorDy
-
-    local tv = common.dot(dx, dy, floorTangentX, floorTangentY)
-
-    if math.abs(tv) < friction then
-      self.dx = self.dx - tv * floorTangentX
-      self.dy = self.dy - tv * floorTangentY
-    else
-      self.dx = self.dx - common.sign(tv) * friction * floorTangentX
-      self.dy = self.dy - common.sign(tv) * friction * floorTangentY
-    end
-  end
+  self.contacts.floor:applyFriction(friction)
 end
 
 function Character:applyFloorConstraint()
-  local physics = game.names.physics
-
-  if self.floor then
-    self.y = self.floorY - 0.5 * self.height
-
-    local dx = self.dx - self.floorDx
-    local dy = self.dy - self.floorDy
-
-    local nv = common.dot(dx, dy, self.floorNormalX, self.floorNormalY)
-
-    if nv < 0 then
-      self.dx = self.dx - nv * self.floorNormalX
-      self.dy = self.dy - nv * self.floorNormalY
-    end
-  end
+  self.contacts.floor:applyConstraint()
 end
 
 function Character:update(dt)

@@ -28,19 +28,23 @@ function CharacterWalkState:update(dt)
 
   self.character:updateFloorContact()
 
-  if not self.character.floor then
+  local floorContact = self.character.contacts.floor
+
+  if not floorContact.touching then
     self.character:setLowerState("fall")
     return
   end
 
-  local floorTangentX = -self.character.floorNormalY
-  local floorTangentY = self.character.floorNormalX
+  self.character.dy = self.character.dy + self.character.fallAcceleration * dt
+
+  local floorTangentX = -floorContact.contactNormalY
+  local floorTangentY = floorContact.contactNormalX
 
   self.character.dx = self.character.dx + inputX * self.character.walkAcceleration * dt * floorTangentX
   self.character.dy = self.character.dy + inputX * self.character.walkAcceleration * dt * floorTangentY
 
-  local dx = self.character.dx - self.character.floorDx
-  local dy = self.character.dy - self.character.floorDy
+  local dx = self.character.dx - floorContact.contactLinearVelocityX
+  local dy = self.character.dy - floorContact.contactLinearVelocityY
 
   local tv = common.dot(dx, dy, floorTangentX, floorTangentY)
 

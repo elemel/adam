@@ -36,7 +36,7 @@ function CharacterStandState:update(dt)
 
   self.character:applyFloorConstraint()
 
-  if not self.character.floor then
+  if not self.character.contacts.floor.touching then
     self.character:setLowerState("fall")
     return
   end

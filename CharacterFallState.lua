@@ -33,7 +33,7 @@ function CharacterFallState:update(dt)
   self.character:updateFloorContact()
   self.character:applyFloorConstraint()
 
-  if self.character.floor then
+  if self.character.contacts.floor.touching then
     self.character:setLowerState("land")
     return
   end
