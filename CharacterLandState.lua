@@ -24,7 +24,6 @@ function CharacterLandState:destroy()
 end
 
 function CharacterLandState:update(dt)
-  self.character.dy = 0
   game.sounds.land:clone():play()
 
   self.character:setLowerState("stand")

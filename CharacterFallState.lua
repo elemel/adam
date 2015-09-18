@@ -24,11 +24,11 @@ function CharacterFallState:destroy()
 end
 
 function CharacterFallState:update(dt)
-  self.character.dy = self.character.dy + self.character.fallAcceleration * dt
+  self.character:updateGravity(dt)
+
   self.character.dy = math.min(self.character.dy, self.character.maxFallVelocity)
 
-  self.character.x = self.character.x + self.character.dx * dt
-  self.character.y = self.character.y + self.character.dy * dt
+  self.character:updatePosition(dt)
 
   self.character:updateFloorContact()
   self.character:applyFloorConstraint()

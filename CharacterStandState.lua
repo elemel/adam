@@ -26,13 +26,12 @@ end
 function CharacterStandState:update(dt)
   local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
 
+  self.character:updateGravity(dt)
+
   self.character:updateFloorContact()
   self.character:applyFloorFriction(self.character.walkAcceleration * dt)
 
-  self.character.dy = self.character.dy + self.character.fallAcceleration * dt
-
-  self.character.x = self.character.x + self.character.dx * dt
-  self.character.y = self.character.y + self.character.dy * dt
+  self.character:updatePosition(dt)
 
   self.character:applyFloorConstraint()
 

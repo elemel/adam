@@ -44,7 +44,6 @@ function Character.new(args)
   character.walkAcceleration = args.walkAcceleration or 16
   character.maxWalkVelocity = args.maxWalkVelocity or 4
   character.jumpVelocity = 8
-  character.fallAcceleration = 10
   character.maxFallVelocity = 10
   character.maxGrabDistance = 2
 
@@ -151,6 +150,18 @@ function Character:setLowerState(state)
   end
 end
 
+function Character:updateGravity(dt)
+  local gravityX, gravityY = game.names.physics.world:getGravity()
+
+  self.dx = self.dx + gravityX * dt
+  self.dy = self.dy + gravityY * dt
+end
+
+function Character:updatePosition(dt)
+  self.x = self.x + self.dx * dt
+  self.y = self.y + self.dy * dt
+end
+
 function Character:updateFloorContact()
   self.contacts.floor:updateContact()
 end
@@ -199,7 +210,6 @@ function Character:update(dt)
       end
     end
 
-    self.dy = self.dy + self.fallAcceleration * dt
     self.dy = math.min(self.dy, self.maxFallVelocity)
     self.angle = self.angle + self.dAngle * dt
   end

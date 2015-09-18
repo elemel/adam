@@ -35,7 +35,7 @@ function CharacterWalkState:update(dt)
     return
   end
 
-  self.character.dy = self.character.dy + self.character.fallAcceleration * dt
+  self.character:updateGravity(dt)
 
   local floorTangentX = -floorContact.contactNormalY
   local floorTangentY = floorContact.contactNormalX
@@ -53,8 +53,7 @@ function CharacterWalkState:update(dt)
     self.character.dy = self.character.dy - common.sign(tv) * (math.abs(tv) - self.character.maxWalkVelocity) * floorTangentY
   end
 
-  self.character.x = self.character.x + self.character.dx * dt
-  self.character.y = self.character.y + self.character.dy * dt
+  self.character:updatePosition(dt)
 
   self.character:applyFloorConstraint()
 
