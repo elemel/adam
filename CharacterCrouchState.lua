@@ -1,29 +1,29 @@
-local CharacterStandAnimation = require "CharacterStandAnimation"
+local CharacterCrouchAnimation = require "CharacterCrouchAnimation"
 local common = require "common"
 
-local CharacterStandState = {}
-CharacterStandState.__index = CharacterStandState
+local CharacterCrouchState = {}
+CharacterCrouchState.__index = CharacterCrouchState
 
-function CharacterStandState.new(args)
+function CharacterCrouchState.new(args)
   local state = {}
-  setmetatable(state, CharacterStandState)
+  setmetatable(state, CharacterCrouchState)
 
   state.character = args.character
 
-  state.character.lowerAnimation = CharacterStandAnimation.new({character = state.character})
+  state.character.lowerAnimation = CharacterCrouchAnimation.new({character = state.character})
 
-  game.updates.control[state] = CharacterStandState.update
+  game.updates.control[state] = CharacterCrouchState.update
 
   return state
 end
 
-function CharacterStandState:destroy()
+function CharacterCrouchState:destroy()
   game.updates.control[self] = nil
 
   self.character.lowerAnimation = nil
 end
 
-function CharacterStandState:update(dt)
+function CharacterCrouchState:update(dt)
   local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
   local inputY = (self.character.downInput and 1 or 0) - (self.character.upInput and 1 or 0)
 
@@ -61,15 +61,10 @@ function CharacterStandState:update(dt)
     return
   end
 
-  if inputY == 1 then
-    self.character:setLowerState("crouch")
-    return
-  end
-
-  if inputX ~= 0 then
-    self.character:setLowerState("walk")
+  if inputY ~= 1 then
+    self.character:setLowerState("stand")
     return
   end
 end
 
-return CharacterStandState
+return CharacterCrouchState

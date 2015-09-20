@@ -33,6 +33,9 @@ function KeyboardInput:update(dt)
     character.leftInput = getInput("left")
     character.rightInput = getInput("right")
 
+    character.upInput = getInput("up")
+    character.downInput = getInput("down")
+
     character.jumpInput = getInput("jump")
   end
 end

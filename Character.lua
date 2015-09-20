@@ -1,3 +1,4 @@
+local CharacterCrouchState = require "CharacterCrouchState"
 local CharacterFallState = require "CharacterFallState"
 local CharacterGrabState = require "CharacterGrabState"
 local CharacterHoldState = require "CharacterHoldState"
@@ -131,7 +132,9 @@ function Character:setLowerState(state)
     self.lowerState = nil
   end
 
-  if state == "fall" then
+  if state == "crouch" then
+    self.lowerState = CharacterCrouchState.new({character = self})
+  elseif state == "fall" then
     self.lowerState = CharacterFallState.new({character = self})
   elseif state == "jump" then
     self.lowerState = CharacterJumpState.new({character = self})

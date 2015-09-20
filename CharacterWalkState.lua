@@ -25,6 +25,7 @@ end
 
 function CharacterWalkState:update(dt)
   local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
+  local inputY = (self.character.downInput and 1 or 0) - (self.character.upInput and 1 or 0)
 
   local floorFixture = self.character.physics:getFloorFixture()
 
@@ -60,6 +61,11 @@ function CharacterWalkState:update(dt)
 
   if self.character.jumpInput then
     self.character:setLowerState("jump")
+    return
+  end
+
+  if inputY == 1 then
+    self.character:setLowerState("crouch")
     return
   end
 
