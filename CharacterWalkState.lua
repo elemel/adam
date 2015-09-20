@@ -12,13 +12,13 @@ function CharacterWalkState.new(args)
 
   state.character.lowerAnimation = CharacterRunAnimation.new({character = state.character})
 
-  game.updates.physics[state] = CharacterWalkState.update
+  game.updates.control[state] = CharacterWalkState.update
 
   return state
 end
 
 function CharacterWalkState:destroy()
-  game.updates.physics[self] = nil
+  game.updates.control[self] = nil
 
   self.character.lowerAnimation = nil
 end
@@ -26,36 +26,37 @@ end
 function CharacterWalkState:update(dt)
   local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
 
-  self.character:updateFloorContact()
+  local floorFixture = self.character.physics:getFloorFixture()
 
-  local floorContact = self.character.contacts.floor
-
-  if not floorContact.touching then
+  if not floorFixture then
     self.character:setLowerState("fall")
     return
   end
 
-  self.character:updateGravity(dt)
+  local distance, x1, y1, x2, y2 = love.physics.getDistance(self.character.physics.bottomFixture, floorFixture)
 
-  local floorTangentX = -floorContact.contactNormalY
-  local floorTangentY = floorContact.contactNormalX
+  local x0, y0 = self.character.physics.body:getWorldPoint(self.character.physics.bottomFixture:getShape():getPoint())
+  local normalX, normalY = common.normalize(x0 - x2, y0 - y2)
+  local tangentX, tangentY = -normalY, normalX
 
-  self.character.dx = self.character.dx + inputX * self.character.walkAcceleration * dt * floorTangentX
-  self.character.dy = self.character.dy + inputX * self.character.walkAcceleration * dt * floorTangentY
+  local velocityX1, velocityY1 = self.character.physics.body:getLinearVelocityFromWorldPoint(x1, y1)
+  local velocityX2, velocityY2 = floorFixture:getBody():getLinearVelocityFromWorldPoint(x2, y2)
 
-  local dx = self.character.dx - floorContact.contactLinearVelocityX
-  local dy = self.character.dy - floorContact.contactLinearVelocityY
+  velocityX1 = velocityX1 + inputX * self.character.walkAcceleration * dt * tangentX
+  velocityY1 = velocityY1 + inputX * self.character.walkAcceleration * dt * tangentY
 
-  local tv = common.dot(dx, dy, floorTangentX, floorTangentY)
+  local gravityX, gravityY = game.names.physics.world:getGravity()
 
-  if math.abs(tv) > self.character.maxWalkVelocity then
-    self.character.dx = self.character.dx - common.sign(tv) * (math.abs(tv) - self.character.maxWalkVelocity) * floorTangentX
-    self.character.dy = self.character.dy - common.sign(tv) * (math.abs(tv) - self.character.maxWalkVelocity) * floorTangentY
-  end
+  velocityX1 = velocityX1 + gravityX * dt
+  velocityY1 = velocityY1 + gravityY * dt
 
-  self.character:updatePosition(dt)
+  local velocity = common.dot(velocityX1 - velocityX2, velocityY1 - velocityY2, tangentX, tangentY)
+  local friction = common.sign(velocity) * math.max(math.abs(velocity) - self.character.maxWalkVelocity, 0)
 
-  self.character:applyFloorConstraint()
+  velocityX1 = velocityX1 - friction * tangentX
+  velocityY1 = velocityY1 - friction * tangentY
+
+  self.character.physics.body:setLinearVelocity(velocityX1, velocityY1)
 
   if self.character.jumpInput then
     self.character:setLowerState("jump")

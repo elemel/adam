@@ -20,7 +20,8 @@ function TrackingShot:update(dt)
   local character = game.names.adam
 
   if character then
-    game.camera.x = character.x
+    local x, y = character.physics.body:getPosition()
+    game.camera.x = x
   end
 end
 

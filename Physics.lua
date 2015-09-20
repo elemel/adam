@@ -18,6 +18,8 @@ function Physics:update(dt)
 end
 
 function Physics:debugDraw()
+  love.graphics.setColor(0x00, 0xff, 0x00, 0xff)
+
   for i, body in pairs(self.world:getBodyList()) do
     for i, fixture in pairs(body:getFixtureList()) do
       local shape = fixture:getShape()

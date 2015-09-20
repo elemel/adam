@@ -22,12 +22,12 @@ function Platform.new(args)
 
   platform.time = 0
 
-  game.updates.controls[platform] = Platform.update
+  game.updates.control[platform] = Platform.update
   return platform
 end
 
 function Platform:destroy()
-  game.updates.controls[self] = nil
+  game.updates.control[self] = nil
   self.body:destroy()
 end
 

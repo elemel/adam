@@ -24,7 +24,8 @@ function CharacterJumpState:destroy()
 end
 
 function CharacterJumpState:update(dt)
-  self.character.dy = -self.character.jumpVelocity
+  local velocityX, velocityY = self.character.physics.body:getLinearVelocity()
+  self.character.physics.body:setLinearVelocity(velocityX, -self.character.jumpVelocity)
   game.sounds.jump:clone():play()
 
   self.character:setLowerState("fall")

@@ -4,29 +4,30 @@ local CharacterHoldState = require "CharacterHoldState"
 local CharacterIdleState = require "CharacterIdleState"
 local CharacterJumpState = require "CharacterJumpState"
 local CharacterLandState = require "CharacterLandState"
+local CharacterPhysics = require "CharacterPhysics"
 local CharacterStandState = require "CharacterStandState"
 local CharacterSkeleton = require "CharacterSkeleton"
 local CharacterSkin = require "CharacterSkin"
 local CharacterStruggleState = require "CharacterStruggleState"
 local CharacterThrowState = require "CharacterThrowState"
 local CharacterWalkState = require "CharacterWalkState"
-local CharacterWallContact = require "CharacterWallContact"
 local common = require "common"
 
 local Character = {}
 Character.__index = Character
 
 function Character.new(args)
+  local physics = game.names.physics
   local character = {}
   setmetatable(character, Character)
 
   args = args or {}
 
+  local x = args.x or 0
+  local y = args.y or 0
+
   character.name = args.name
   character.tags = args.tags or {}
-
-  character.x = args.x or 0
-  character.y = args.y or 0
 
   character.angle = args.angle or 0
 
@@ -70,13 +71,13 @@ function Character.new(args)
   character.skeleton = CharacterSkeleton.new({height = character.height})
   character.skin = CharacterSkin.new({skeleton = character.skeleton})
 
-  character.contacts = {
-    floor = CharacterWallContact.new({
-      character = character,
+  character.physics = CharacterPhysics.new({
+    x = x,
+    y = y,
 
-      y2 = 0.5 * character.height,
-    }),
-  }
+    width = character.width,
+    height = character.height,
+  })
 
   game.updates.physics[character] = Character.update
   game.updates.animation[character] = Character.updateAnimation
@@ -162,18 +163,6 @@ function Character:updatePosition(dt)
   self.y = self.y + self.dy * dt
 end
 
-function Character:updateFloorContact()
-  self.contacts.floor:updateContact()
-end
-
-function Character:applyFloorFriction(friction)
-  self.contacts.floor:applyFriction(friction)
-end
-
-function Character:applyFloorConstraint()
-  self.contacts.floor:applyConstraint()
-end
-
 function Character:update(dt)
   local inputX = (self.rightInput and 1 or 0) - (self.leftInput and 1 or 0)
 
@@ -228,10 +217,13 @@ function Character:updateAnimation(dt)
     end
   end
 
+  local x, y = self.physics.body:getPosition()
+  local angle = self.physics.body:getAngle()
+
   self.skeleton.bones.back:set(
-    self.x,
-    self.y - 0.15 * self.height / 1.8,
-    self.angle,
+    x,
+    y - 0.15 * self.height / 1.8,
+    angle,
     self.direction)
 
   if self.lowerAnimation then

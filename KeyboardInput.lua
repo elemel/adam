@@ -1,5 +1,5 @@
-local KeyboardControls = {}
-KeyboardControls.__index = KeyboardControls
+local KeyboardInput = {}
+KeyboardInput.__index = KeyboardInput
 
 local function getInput(input)
   for i, key in pairs(game.keys[input]) do
@@ -11,22 +11,22 @@ local function getInput(input)
   return false
 end
 
-function KeyboardControls.new(args)
-  local controls = {}
-  setmetatable(controls, KeyboardControls)
+function KeyboardInput.new(args)
+  local input = {}
+  setmetatable(input, KeyboardInput)
 
-  game.updates.controls[controls] = KeyboardControls.update
+  game.updates.input[input] = KeyboardInput.update
 
-  return controls
+  return input
 end
 
-function KeyboardControls:destroy()
-  game.updates.controls[self] = nil
+function KeyboardInput:destroy()
+  game.updates.input[self] = nil
 
   self.body:destroy()
 end
 
-function KeyboardControls:update(dt)
+function KeyboardInput:update(dt)
   local character = game.names.adam
 
   if character then
@@ -37,4 +37,4 @@ function KeyboardControls:update(dt)
   end
 end
 
-return KeyboardControls
+return KeyboardInput

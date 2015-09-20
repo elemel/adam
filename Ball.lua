@@ -23,12 +23,12 @@ function Ball.new(args)
 
   ball.time = 0
 
-  game.updates.controls[ball] = Ball.update
+  game.updates.control[ball] = Ball.update
   return ball
 end
 
 function Ball:destroy()
-  game.updates.controls[self] = nil
+  game.updates.control[self] = nil
   self.body:destroy()
 end
 

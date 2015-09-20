@@ -3,9 +3,9 @@ local Ball = require "Ball"
 local Character = require "Character"
 local common = require "common"
 local Fire = require "Fire"
-local KeyboardControls = require "KeyboardControls"
+local KeyboardInput = require "KeyboardInput"
 local Lightning = require "Lightning"
-local MouseControls = require "MouseControls"
+local MouseInput = require "MouseInput"
 local Physics = require "Physics"
 local Platform = require "Platform"
 local SceneGraph = require "SceneGraph"
@@ -15,6 +15,8 @@ local VictorAi = require "VictorAi"
 local VillagerAi = require "VillagerAi"
 
 function love.load()
+  love.physics.setMeter(1)
+
   love.window.setTitle("Adam")
   love.filesystem.setIdentity("adam")
   -- love.mouse.setVisible(false)
@@ -54,7 +56,8 @@ function love.load()
     },
 
     updates = {
-      controls = {},
+      input = {},
+      control = {},
       physics = {},
       collision = {},
       animation = {},
@@ -277,9 +280,9 @@ function love.load()
 
   Character.new({
     name = "adam",
-    width = 1.2,
+    width = 0.8,
     height = 2.4,
-    x = 0,
+    x = -10,
     y = -1.2,
     skin = game.skins.adam,
   })
@@ -321,8 +324,8 @@ function love.load()
   VillagerAi.new()
   -- Lightning.new({x1 = 0, y1 = -16, x2 = 0, y2 = 0})
 
-  KeyboardControls.new()
-  MouseControls.new()
+  KeyboardInput.new()
+  MouseInput.new()
 
   game.music:setLooping(true)
   game.music:play()
@@ -332,7 +335,7 @@ function love.update(dt)
   game.dt = math.min(game.dt + dt, game.maxDt)
 
   if game.dt > game.minDt then
-    for i, phase in ipairs({"controls", "physics", "collision", "animation"}) do
+    for i, phase in ipairs({"input", "control", "physics", "collision", "animation"}) do
       for entity, handler in pairs(game.updates[phase]) do
         handler(entity, dt)
       end

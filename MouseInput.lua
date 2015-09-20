@@ -1,27 +1,27 @@
 local common = require "common"
 
-local MouseControls = {}
-MouseControls.__index = MouseControls
+local MouseInput = {}
+MouseInput.__index = MouseInput
 
-function MouseControls.new(args)
-  local controls = {}
-  setmetatable(controls, MouseControls)
+function MouseInput.new(args)
+  local input = {}
+  setmetatable(input, MouseInput)
 
-  controls.x = 0
-  controls.y = 0
+  input.x = 0
+  input.y = 0
 
-  game.updates.controls[controls] = MouseControls.update
-  game.draws.debug[controls] = MouseControls.debugDraw
+  game.updates.input[input] = MouseInput.update
+  game.draws.debug[input] = MouseInput.debugDraw
 
-  return controls
+  return input
 end
 
-function MouseControls:destroy()
+function MouseInput:destroy()
   game.draws.debug[self] = nil
-  game.updates.controls[self] = nil
+  game.updates.input[self] = nil
 end
 
-function MouseControls:update(dt)
+function MouseInput:update(dt)
   local x, y = love.mouse.getPosition()
   local width, height = love.window.getDimensions()
 
@@ -48,9 +48,9 @@ function MouseControls:update(dt)
   end
 end
 
-function MouseControls:debugDraw()
+function MouseInput:debugDraw()
   love.graphics.setColor(0x00, 0xff, 0x00, 0xff)
   love.graphics.circle("fill", self.x, self.y, 1 / 8)
 end
 
-return MouseControls
+return MouseInput

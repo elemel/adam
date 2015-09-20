@@ -86,6 +86,10 @@ local function normalize(x, y)
   return x / length, y / length, length
 end
 
+local function length(x, y)
+  return math.sqrt(x ^ 2 + y ^ 2)
+end
+
 return {
   clamp = clamp,
   distance = distance,
@@ -93,6 +97,7 @@ return {
   get2 = get2,
   filter = filter,
   keys = keys,
+  length = length,
   mix = mix,
   normalize = normalize,
   set2 = set2,

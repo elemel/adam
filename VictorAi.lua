@@ -9,13 +9,13 @@ function VictorAi.new(args)
 
   ai.delay = 0
 
-  game.updates.controls[ai] = VictorAi.update
+  game.updates.input[ai] = VictorAi.update
 
   return terrain
 end
 
 function VictorAi:destroy()
-  game.updates.controls[self] = nil
+  game.updates.input[self] = nil
 end
 
 function VictorAi:update(dt)

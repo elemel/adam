@@ -50,14 +50,6 @@ function CharacterSkin:draw()
   game.shader:send("vertexTransformation", rightLowerLegTransform:toTransposedMatrix4())
   love.graphics.draw(game.images.adamRightLowerLeg)
 
-  local bodyTransform = game.sceneGraph.worldTransforms[self.nodes.body.id]
-  game.shader:send("vertexTransformation", bodyTransform:toTransposedMatrix4())
-  love.graphics.draw(game.images.adamBody)
-
-  local headTransform = game.sceneGraph.worldTransforms[self.nodes.head.id]
-  game.shader:send("vertexTransformation", headTransform:toTransposedMatrix4())
-  love.graphics.draw(game.images.adamHead)
-
   local leftUpperLegTransform = game.sceneGraph.worldTransforms[self.nodes.leftUpperLeg.id]
   game.shader:send("vertexTransformation", leftUpperLegTransform:toTransposedMatrix4())
   love.graphics.draw(game.images.adamLeftUpperLeg)
@@ -65,6 +57,14 @@ function CharacterSkin:draw()
   local leftLowerLegTransform = game.sceneGraph.worldTransforms[self.nodes.leftLowerLeg.id]
   game.shader:send("vertexTransformation", leftLowerLegTransform:toTransposedMatrix4())
   love.graphics.draw(game.images.adamLeftLowerLeg)
+
+  local bodyTransform = game.sceneGraph.worldTransforms[self.nodes.body.id]
+  game.shader:send("vertexTransformation", bodyTransform:toTransposedMatrix4())
+  love.graphics.draw(game.images.adamBody)
+
+  local headTransform = game.sceneGraph.worldTransforms[self.nodes.head.id]
+  game.shader:send("vertexTransformation", headTransform:toTransposedMatrix4())
+  love.graphics.draw(game.images.adamHead)
 
   local leftUpperArmTransform = game.sceneGraph.worldTransforms[self.nodes.leftUpperArm.id]
   game.shader:send("vertexTransformation", leftUpperArmTransform:toTransposedMatrix4())
