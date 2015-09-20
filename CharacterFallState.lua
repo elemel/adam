@@ -24,6 +24,8 @@ function CharacterFallState:destroy()
 end
 
 function CharacterFallState:update(dt)
+  local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
+
   if self.character.physics:getFloorFixture() then
     self.character:setLowerState("land")
     return
@@ -34,6 +36,12 @@ function CharacterFallState:update(dt)
 
   velocityX = velocityX + gravityX * dt
   velocityY = velocityY + gravityY * dt
+
+  if inputX * velocityX < 0 then
+    velocityX = velocityX + inputX * self.character.driftAcceleration * dt
+  elseif math.abs(velocityX) < self.character.maxDriftVelocity then
+    velocityX = velocityX + inputX * math.min(self.character.driftAcceleration * dt, self.character.maxDriftVelocity - math.abs(velocityX))
+  end
 
   self.character.physics.body:setLinearVelocity(velocityX, velocityY)
 end

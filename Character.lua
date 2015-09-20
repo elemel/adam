@@ -35,10 +35,13 @@ function Character.new(args)
   character.direction = 1
 
   character.walkAcceleration = args.walkAcceleration or 12
-  character.maxWalkVelocity = args.maxWalkVelocity or 4
-  character.jumpVelocity = 8
+  character.maxWalkVelocity = args.maxWalkVelocity or 6
+  character.jumpVelocity = 9
   character.maxFallVelocity = 10
   character.maxGrabDistance = 2
+  character.driftAcceleration = args.driftAcceleration or 6
+  character.maxDriftVelocity = args.maxDriftVelocity or 3
+
 
   character.throwVelocity = 8
 
