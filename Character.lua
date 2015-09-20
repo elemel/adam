@@ -34,7 +34,7 @@ function Character.new(args)
 
   character.direction = 1
 
-  character.walkAcceleration = args.walkAcceleration or 16
+  character.walkAcceleration = args.walkAcceleration or 12
   character.maxWalkVelocity = args.maxWalkVelocity or 4
   character.jumpVelocity = 8
   character.maxFallVelocity = 10
