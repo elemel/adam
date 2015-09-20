@@ -151,18 +151,6 @@ function Character:setLowerState(state)
   end
 end
 
-function Character:updateGravity(dt)
-  local gravityX, gravityY = game.names.physics.world:getGravity()
-
-  self.dx = self.dx + gravityX * dt
-  self.dy = self.dy + gravityY * dt
-end
-
-function Character:updatePosition(dt)
-  self.x = self.x + self.dx * dt
-  self.y = self.y + self.dy * dt
-end
-
 function Character:update(dt)
   local inputX = (self.rightInput and 1 or 0) - (self.leftInput and 1 or 0)
 
