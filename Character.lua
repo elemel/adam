@@ -29,18 +29,10 @@ function Character.new(args)
   character.name = args.name
   character.tags = args.tags or {}
 
-  character.angle = args.angle or 0
-
-  character.dx = 0
-  character.dy = 0
-
-  character.dAngle = 0
-
   character.width = args.width or 1
   character.height = args.height or 2
 
   character.direction = 1
-  character.floor = false
 
   character.walkAcceleration = args.walkAcceleration or 16
   character.maxWalkVelocity = args.maxWalkVelocity or 4
