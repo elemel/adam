@@ -24,23 +24,10 @@ function VillagerAi:update(dt)
     villager.aiDelay = villager.aiDelay - dt
 
     if villager.aiDelay < 0 then
-      if villager.y > 16 then
-        local spawnDistance = (self.minSpawnDistance +
-          (self.maxSpawnDistance - self.minSpawnDistance) * love.math.random())
-
-        villager.x = game.camera.x + spawnDistance * (2 * love.math.random(0, 1) - 1)
-        villager.y = -1
-
-        villager.dx = 0
-        villager.dy = 0
-
-        villager.angle = 0
-        villager.dAngle = 0
-
-        villager.lowerState = "standing"
-        villager.upperState = nil
-
-        villager.thrown = false
+      local x, y = villager.physics.body:getPosition()
+      if y > 16 then
+        villager:destroy()
+        return
       end
 
       local target = game.names.victor

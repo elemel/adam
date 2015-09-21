@@ -87,26 +87,29 @@ function Character.new(args)
     game.names[character.name] = character
   end
 
-  character:setUpperState("idle")
   character:setLowerState("fall")
+  character:setUpperState("idle")
 
   return character
 end
 
 function Character:destroy()
-  if character.name then
-    game.names[character.name] = nil
+  self:setUpperState(nil)
+  self:setLowerState(nil)
+
+  if self.name then
+    game.names[self.name] = nil
   end
 
   for i, tag in pairs(self.tags) do
     game.tags[tag][self] = nil
   end
 
-  game.draws.scene[character] = nil
-  game.updates.animation[character] = nil
-  game.updates.physics[character] = nil
+  game.draws.scene[self] = nil
+  game.updates.animation[self] = nil
+  game.updates.physics[self] = nil
 
-  self.body:destroy()
+  self.physics:destroy()
 end
 
 function Character:setUpperState(state)
@@ -152,12 +155,8 @@ end
 function Character:update(dt)
   local inputX = (self.rightInput and 1 or 0) - (self.leftInput and 1 or 0)
 
-  if self.captive then
-    self.direction = common.sign(self.targetX - self.x)
-  else
-    if inputX ~= 0 then
-      self.direction = inputX
-    end
+  if inputX ~= 0 then
+    self.direction = inputX
   end
 
   if self.lowerState == "spinning" then
@@ -192,14 +191,16 @@ end
 
 function Character:updateAnimation(dt)
   if self.fire then
+    local x, y = self.physics.body:getPosition()
+
     if self.captor or self.lowerState == "spinning" then
       self.fire.particles:setEmissionRate(64)
-      self.fire.x = self.x
-      self.fire.y = self.y
+      self.fire.x = x
+      self.fire.y = y
     else
       self.fire.particles:setEmissionRate(32)
-      self.fire.x = self.x + self.direction * self.width
-      self.fire.y = self.y - 0.25 * self.height
+      self.fire.x = x + self.direction * self.width
+      self.fire.y = y - 0.25 * self.height
     end
   end
 

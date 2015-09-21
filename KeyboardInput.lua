@@ -30,6 +30,8 @@ function KeyboardInput:update(dt)
   local character = game.names.adam
 
   if character then
+    character.oldAttackInput = character.attackInput
+
     character.leftInput = getInput("left")
     character.rightInput = getInput("right")
 
@@ -37,6 +39,7 @@ function KeyboardInput:update(dt)
     character.downInput = getInput("down")
 
     character.jumpInput = getInput("jump")
+    character.attackInput = getInput("attack")
   end
 end
 

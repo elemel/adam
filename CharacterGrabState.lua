@@ -30,7 +30,10 @@ function CharacterGrabState:update(dt)
   end
 
   local function squaredDistance(villager)
-    return common.squaredDistance(self.character.x, self.character.y, villager.x, villager.y)
+    local x, y = self.character.physics.body:getPosition()
+    local targetX, targetY = villager.physics.body:getPosition()
+
+    return common.squaredDistance(x, y, targetX, targetY)
   end
 
   local villagers = common.filter(common.keys(game.tags.villager),

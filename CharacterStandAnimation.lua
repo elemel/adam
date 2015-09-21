@@ -25,14 +25,14 @@ function CharacterStandAnimation:update(dt)
   bones.leftShoulder:setAngle(0)
   bones.rightShoulder:setAngle(0)
 
-  bones.leftElbow:setAngle(0)
-  bones.rightElbow:setAngle(0)
+  bones.leftElbow:setAngle(-(1 / 16) * math.pi)
+  bones.rightElbow:setAngle(-(1 / 16) * math.pi)
 
   bones.leftHip:setAngle(0)
-  bones.rightHip:setAngle(0)
+  bones.rightHip:setAngle(-(1 / 16) * math.pi)
 
-  bones.leftKnee:setAngle(0)
-  bones.rightKnee:setAngle(0)
+  bones.leftKnee:setAngle((1 / 16) * math.pi)
+  bones.rightKnee:setAngle((1 / 16) * math.pi)
 end
 
 return CharacterStandAnimation

@@ -5,7 +5,6 @@ local common = require "common"
 local Fire = require "Fire"
 local KeyboardInput = require "KeyboardInput"
 local Lightning = require "Lightning"
-local MouseInput = require "MouseInput"
 local Physics = require "Physics"
 local Platform = require "Platform"
 local SceneGraph = require "SceneGraph"
@@ -19,7 +18,7 @@ function love.load()
 
   love.window.setTitle("Adam")
   love.filesystem.setIdentity("adam")
-  -- love.mouse.setVisible(false)
+  love.mouse.setVisible(false)
 
   love.window.setMode(800, 600, {
     -- fullscreen = true,
@@ -51,8 +50,8 @@ function love.load()
       down = {"s", "down"},
       right = {"d", "right"},
 
-      jump = {" "},
-      throw = {"j", "lshift", "rshift"},
+      jump = {" ", "k"},
+      attack = {"j"},
     },
 
     updates = {
@@ -299,22 +298,25 @@ function love.load()
   --   color = {common.toByteColor(0, 0.75, 1, 1)},
   -- })
 
-  for i = 1, 0 do
+  for i = 1, 1 do
+    local x = 16 + 16 * love.math.random()
+    local y = -0.9
+
     local villager = Character.new({
       tags = {"villager"},
       skin = game.skins.adam,
       width = 0.9,
       height = 1.8,
-      x = 16 + 16 * love.math.random(),
-      y = -0.9,
+      x = x,
+      y = y,
       walkAcceleration = 2,
       maxWalkVelocity = 1,
       color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},
     })
 
     villager.fire = Fire.new({
-      x = villager.x,
-      y = villager.y - 1.5,
+      x = x,
+      y = y,
     })
   end
 
@@ -325,7 +327,6 @@ function love.load()
   -- Lightning.new({x1 = 0, y1 = -16, x2 = 0, y2 = 0})
 
   KeyboardInput.new()
-  MouseInput.new()
 
   game.music:setLooping(true)
   game.music:play()

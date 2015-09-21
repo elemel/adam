@@ -9,7 +9,7 @@ function Physics.new(args)
 
   game.names.physics = physics
   game.updates.physics[physics] = Physics.update
-  -- game.draws.debug[physics] = Physics.debugDraw
+  game.draws.debug[physics] = Physics.debugDraw
   return physics
 end
 

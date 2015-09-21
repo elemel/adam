@@ -24,19 +24,21 @@ function CharacterThrowState:destroy()
 end
 
 function CharacterThrowState:update(dt)
-  local scale = self.character.skeleton.height / 1.8
-  local angle = math.atan2(self.character.targetY - self.character.y + scale * 0.6,
-    self.character.direction * (self.character.targetX - self.character.x))
+  local inputY = (self.character.downInput and 1 or 0) - (self.character.upInput and 1 or 0)
+
+  local angle = inputY * 0.25 * math.pi - 0.25 * math.pi
 
   game.sounds.throw:clone():play()
 
-  self.character.captive.dx = self.character.dx + self.character.direction * self.character.throwVelocity * math.cos(angle)
-  self.character.captive.dy = self.character.dy + self.character.throwVelocity * math.sin(angle)
-  self.character.captive.dAngle = -math.pi * self.character.direction * (1 + love.math.random())
+  local velocityX, velocityY = self.character.physics.body:getLinearVelocity()
+  velocityX = velocityX + self.character.throwVelocity * math.cos(angle)
+  velocityY = velocityY + self.character.throwVelocity * math.sin(angle)
+
+  self.character.captive.physics.body:setLinearVelocity(velocityX, velocityY)
+  self.character.captive.physics.body:setAngularVelocity(-math.pi * self.character.direction * (1 + love.math.random()))
 
   game.sceneGraph:setParent(self.character.captive.skeleton.bones.back.id, nil)
-  self.character.captive.x = self.character.x
-  self.character.captive.y = self.character.y
+  self.character.captive.physics.body:setPosition(self.character.physics.body:getPosition())
   self.character.captive.thrown = true
   self.character.captive.captor = nil
 
