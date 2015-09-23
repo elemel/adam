@@ -1,35 +1,35 @@
 local CharacterCrouchAnimation = require "CharacterCrouchAnimation"
 local common = require "common"
 
-local CharacterCrouchState = {}
-CharacterCrouchState.__index = CharacterCrouchState
+local CharacterSlideState = {}
+CharacterSlideState.__index = CharacterSlideState
 
-function CharacterCrouchState.new(args)
+function CharacterSlideState.new(args)
   local state = {}
-  setmetatable(state, CharacterCrouchState)
+  setmetatable(state, CharacterSlideState)
 
   state.character = args.character
 
   state.character.lowerAnimation = CharacterCrouchAnimation.new({character = state.character})
 
-  game.updates.control[state] = CharacterCrouchState.update
+  state.delay = 0.5
+
+  game.updates.control[state] = CharacterSlideState.update
 
   return state
 end
 
-function CharacterCrouchState:destroy()
+function CharacterSlideState:destroy()
   game.updates.control[self] = nil
 
   self.character.lowerAnimation = nil
 end
 
-function CharacterCrouchState:update(dt)
+function CharacterSlideState:update(dt)
+  self.delay = self.delay - dt
+
   local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
   local inputY = (self.character.downInput and 1 or 0) - (self.character.upInput and 1 or 0)
-
-  if inputX ~= 0 then
-    self.character.direction = inputX
-  end
 
   local floorFixture = self.character.physics:getFloorFixture()
 
@@ -53,12 +53,17 @@ function CharacterCrouchState:update(dt)
   velocityY1 = velocityY1 + gravityY * dt
 
   local velocity = common.dot(velocityX1 - velocityX2, velocityY1 - velocityY2, tangentX, tangentY)
-  local friction = common.sign(velocity) * math.min(math.abs(velocity), self.character.walkAcceleration * dt)
+  local friction = common.sign(velocity) * math.max(math.abs(velocity) - self.character.maxSlideVelocity, 0)
 
   velocityX1 = velocityX1 - friction * tangentX
   velocityY1 = velocityY1 - friction * tangentY
 
   self.character.physics.body:setLinearVelocity(velocityX1, velocityY1)
+
+  if self.delay < 0 then
+    self.character:setLowerState("crouch")
+    return
+  end
 
   if self.character.jumpInput and not self.character.oldJumpInput then
     self.character:setLowerState("jump")
@@ -71,4 +76,4 @@ function CharacterCrouchState:update(dt)
   end
 end
 
-return CharacterCrouchState
+return CharacterSlideState

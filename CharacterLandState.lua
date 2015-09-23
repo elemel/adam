@@ -26,6 +26,19 @@ end
 function CharacterLandState:update(dt)
   game.sounds.land:clone():play()
 
+  local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
+  local inputY = (self.character.downInput and 1 or 0) - (self.character.upInput and 1 or 0)
+
+  if inputY == 1 then
+    self.character:setLowerState("slide")
+    return
+  end
+
+  if inputX ~= 0 then
+    self.character:setLowerState("walk")
+    return
+  end
+
   self.character:setLowerState("stand")
 end
 

@@ -12,13 +12,13 @@ function CharacterThrowState.new(args)
 
   state.character.upperAnimation = CharacterHoldAnimation.new({character = state.character})
 
-  game.updates.physics[state] = CharacterThrowState.update
+  game.updates.control[state] = CharacterThrowState.update
 
   return state
 end
 
 function CharacterThrowState:destroy()
-  game.updates.physics[self] = nil
+  game.updates.control[self] = nil
 
   self.character.upperAnimation = nil
 end
@@ -31,14 +31,12 @@ function CharacterThrowState:update(dt)
   game.sounds.throw:clone():play()
 
   local velocityX, velocityY = self.character.physics.body:getLinearVelocity()
-  velocityX = velocityX + self.character.throwVelocity * math.cos(angle)
+  velocityX = velocityX + self.character.direction * self.character.throwVelocity * math.cos(angle)
   velocityY = velocityY + self.character.throwVelocity * math.sin(angle)
 
   self.character.captive.physics.body:setLinearVelocity(velocityX, velocityY)
   self.character.captive.physics.body:setAngularVelocity(-math.pi * self.character.direction * (1 + love.math.random()))
 
-  game.sceneGraph:setParent(self.character.captive.skeleton.bones.back.id, nil)
-  self.character.captive.physics.body:setPosition(self.character.physics.body:getPosition())
   self.character.captive.thrown = true
   self.character.captive.captor = nil
 

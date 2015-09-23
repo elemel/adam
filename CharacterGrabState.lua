@@ -12,13 +12,13 @@ function CharacterGrabState.new(args)
 
   state.character.upperAnimation = CharacterHoldAnimation.new({character = state.character})
 
-  game.updates.physics[state] = CharacterGrabState.update
+  game.updates.control[state] = CharacterGrabState.update
 
   return state
 end
 
 function CharacterGrabState:destroy()
-  game.updates.physics[self] = nil
+  game.updates.control[self] = nil
 
   self.character.upperAnimation = nil
 end
@@ -50,7 +50,6 @@ function CharacterGrabState:update(dt)
     self.character.captive = villagers[1]
     self.character.captive.captor = self
     self.character.captive:setLowerState("struggle")
-    game.sceneGraph:setParent(self.character.captive.skeleton.bones.back.id, self.character.skeleton.bones.rightWrist.id)
     self.character:setUpperState("hold")
 
     game.sounds.grab:clone():play()

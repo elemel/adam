@@ -31,8 +31,8 @@ function CharacterStruggleAnimation:update(dt)
   bones.leftElbow:setAngle(math.pi * common.mix(-0.5, 0, phase(0.5)))
   bones.rightElbow:setAngle(math.pi * common.mix(-0.5, 0, phase(0)))
 
-  bones.leftHip:setAngle(math.pi * common.mix(-0.25, 0.25, phase(0.25)))
-  bones.rightHip:setAngle(math.pi * common.mix(-0.25, 0.25, phase(0.75)))
+  bones.leftHip:setAngle(math.pi * common.mix(-0.5, 0, phase(0.25)))
+  bones.rightHip:setAngle(math.pi * common.mix(-0.5, 0, phase(0.75)))
 
   bones.leftKnee:setAngle(math.pi * common.mix(0, 0.5, phase(0.25)))
   bones.rightKnee:setAngle(math.pi * common.mix(0, 0.5, phase(0.75)))

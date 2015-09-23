@@ -56,7 +56,7 @@ function CharacterStandState:update(dt)
 
   self.character.physics.body:setLinearVelocity(velocityX1, velocityY1)
 
-  if self.character.jumpInput then
+  if self.character.jumpInput and not self.character.oldJumpInput then
     self.character:setLowerState("jump")
     return
   end

@@ -10,25 +10,16 @@ function CharacterStruggleState.new(args)
 
   state.character = args.character
 
+  state.character.physics.topFixture:setSensor(true)
+  state.character.physics.bottomFixture:setSensor(true)
+
   state.character.lowerAnimation = CharacterStruggleAnimation.new({character = state.character})
-
-  state.character.x = 0
-  state.character.y = 0
-  state.character.dx = 0
-  state.character.dy = 0
-
-  game.updates.physics[state] = CharacterStruggleState.update
 
   return state
 end
 
 function CharacterStruggleState:destroy()
-  game.updates.physics[self] = nil
-
   self.character.lowerAnimation = nil
-end
-
-function CharacterStruggleState:update(dt)
 end
 
 return CharacterStruggleState

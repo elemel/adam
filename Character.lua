@@ -5,7 +5,9 @@ local CharacterHoldState = require "CharacterHoldState"
 local CharacterIdleState = require "CharacterIdleState"
 local CharacterJumpState = require "CharacterJumpState"
 local CharacterLandState = require "CharacterLandState"
+local CharacterLongJumpState = require "CharacterLongJumpState"
 local CharacterPhysics = require "CharacterPhysics"
+local CharacterSlideState = require "CharacterSlideState"
 local CharacterStandState = require "CharacterStandState"
 local CharacterSkeleton = require "CharacterSkeleton"
 local CharacterSkin = require "CharacterSkin"
@@ -37,12 +39,14 @@ function Character.new(args)
 
   character.walkAcceleration = args.walkAcceleration or 12
   character.maxWalkVelocity = args.maxWalkVelocity or 6
-  character.jumpVelocity = 9
+  character.jumpVelocity = 8
   character.maxFallVelocity = 10
   character.maxGrabDistance = 2
   character.driftAcceleration = args.driftAcceleration or 6
   character.maxDriftVelocity = args.maxDriftVelocity or 3
-
+  character.maxSlideVelocity = args.maxSlideVelocity or 6
+  character.longJumpVelocity = 6
+  character.longJumpAngle = math.pi / 3
 
   character.throwVelocity = 8
 
@@ -54,6 +58,7 @@ function Character.new(args)
   character.jumpInput = false
   character.attackInput = false
 
+  character.oldJumpInput = false
   character.oldAttackInput = false
 
   character.targetX = 0
@@ -75,7 +80,6 @@ function Character.new(args)
     height = character.height,
   })
 
-  game.updates.physics[character] = Character.update
   game.updates.animation[character] = Character.updateAnimation
   game.draws.scene[character] = Character.draw
 
@@ -107,7 +111,6 @@ function Character:destroy()
 
   game.draws.scene[self] = nil
   game.updates.animation[self] = nil
-  game.updates.physics[self] = nil
 
   self.physics:destroy()
 end
@@ -143,49 +146,16 @@ function Character:setLowerState(state)
     self.lowerState = CharacterJumpState.new({character = self})
   elseif state == "land" then
     self.lowerState = CharacterLandState.new({character = self})
+  elseif state == "longJump" then
+    self.lowerState = CharacterLongJumpState.new({character = self})
+  elseif state == "slide" then
+    self.lowerState = CharacterSlideState.new({character = self})
   elseif state == "stand" then
     self.lowerState = CharacterStandState.new({character = self})
   elseif state == "struggle" then
     self.lowerState = CharacterStruggleState.new({character = self})
   elseif state == "walk" then
     self.lowerState = CharacterWalkState.new({character = self})
-  end
-end
-
-function Character:update(dt)
-  local inputX = (self.rightInput and 1 or 0) - (self.leftInput and 1 or 0)
-
-  if inputX ~= 0 then
-    self.direction = inputX
-  end
-
-  if self.lowerState == "spinning" then
-    if self.thrown then
-      local function squaredDistance(villager)
-        return common.squaredDistance(self.x, self.y, villager.x, villager.y)
-      end
-
-      local villagers = common.filter(common.keys(game.tags.villager),
-        function(villager)
-          return (villager.lowerState ~= "grabbed" and
-            villager.lowerState ~= "spinning" and
-            squaredDistance(villager) < self.width ^ 2)
-        end)
-
-      if #villagers >= 1 then
-        local villager = villagers[love.math.random(1, #villagers)]
-        villager.dx = villager.dx + 0.25 * self.dx
-        villager.dAngle = -math.pi * (2 * love.math.random(0, 1) - 1) * (1 + love.math.random())
-
-        self.thrown = false
-        self.dx = self.dx - 0.25 * self.dx
-
-        game.sounds.collide:clone():play()
-      end
-    end
-
-    self.dy = math.min(self.dy, self.maxFallVelocity)
-    self.angle = self.angle + self.dAngle * dt
   end
 end
 

@@ -12,6 +12,8 @@ function CharacterFallState.new(args)
 
   state.character.lowerAnimation = CharacterRunAnimation.new({character = state.character})
 
+  state.delay = 0.25
+
   game.updates.control[state] = CharacterFallState.update
 
   return state
@@ -24,9 +26,15 @@ function CharacterFallState:destroy()
 end
 
 function CharacterFallState:update(dt)
+  self.delay = self.delay - dt
+
   local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
 
-  if self.character.physics:getFloorFixture() then
+  if inputX ~= 0 then
+    self.character.direction = inputX
+  end
+
+  if self.delay < 0 and self.character.physics:getFloorFixture() then
     self.character:setLowerState("land")
     return
   end

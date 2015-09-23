@@ -262,26 +262,25 @@ function love.load()
   Physics.new()
   Terrain.new()
 
-  Platform.new({
-    y = -1,
-    width = 4,
-    height = 0.45,
-    angle = 0.125 * math.pi,
-  })
+  -- Platform.new({
+  --   y = -1,
+  --   width = 4,
+  --   height = 0.45,
+  --   angle = 0.125 * math.pi,
+  -- })
 
-  Ball.new({
-    x = 10,
-    y = -1.5,
-    width = 4,
-    height = 0.45,
-    radius = 1.5,
-  })
+  -- Ball.new({
+  --   x = 10,
+  --   y = -1.5,
+  --   width = 4,
+  --   height = 0.45,
+  --   radius = 1.5,
+  -- })
 
   Character.new({
     name = "adam",
     width = 0.8,
     height = 2.4,
-    x = -10,
     y = -1.2,
     skin = game.skins.adam,
   })
@@ -299,13 +298,13 @@ function love.load()
   -- })
 
   for i = 1, 1 do
-    local x = 16 + 16 * love.math.random()
+    local x = 4 * love.math.random()
     local y = -0.9
 
     local villager = Character.new({
       tags = {"villager"},
       skin = game.skins.adam,
-      width = 0.9,
+      width = 0.6,
       height = 1.8,
       x = x,
       y = y,
@@ -314,10 +313,10 @@ function love.load()
       color = {common.toByteColor(1, 0.5 * love.math.random(), 0.5 * love.math.random(), 1)},
     })
 
-    villager.fire = Fire.new({
-      x = x,
-      y = y,
-    })
+    -- villager.fire = Fire.new({
+    --   x = x,
+    --   y = y,
+    -- })
   end
 
   Background.new()

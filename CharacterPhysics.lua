@@ -48,11 +48,15 @@ function CharacterPhysics:getFloorFixture()
       local fixtureA, fixtureB = contact:getFixtures()
 
       if fixtureA == self.bottomSensorFixture then
-        return fixtureB
+        if not fixtureB:isSensor() then
+          return fixtureB
+        end
       end
 
       if fixtureB == self.bottomSensorFixture then
-        return fixtureA
+        if not fixtureA:isSensor() then
+          return fixtureA
+        end
       end
     end
   end

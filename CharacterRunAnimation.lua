@@ -14,9 +14,7 @@ function CharacterRunAnimation.new(args)
 end
 
 function CharacterRunAnimation:update(dt)
-  local inputX = (self.character.rightInput and 1 or 0) - (self.character.leftInput and 1 or 0)
-  local inputSign = common.sign(inputX)
-  self.fraction = self.fraction + inputSign * self.character.direction * dt
+  self.fraction = self.fraction + dt
 
   local function phase(t0, f)
     t0 = t0 or 0
