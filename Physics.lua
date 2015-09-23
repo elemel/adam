@@ -5,7 +5,7 @@ function Physics.new(args)
   local physics = {}
   setmetatable(physics, Physics)
 
-  physics.world = love.physics.newWorld(0, 10)
+  physics.world = love.physics.newWorld(0, 15)
 
   game.names.physics = physics
   game.updates.physics[physics] = Physics.update

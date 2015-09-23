@@ -5,7 +5,6 @@ local CharacterHoldState = require "CharacterHoldState"
 local CharacterIdleState = require "CharacterIdleState"
 local CharacterJumpState = require "CharacterJumpState"
 local CharacterLandState = require "CharacterLandState"
-local CharacterLongJumpState = require "CharacterLongJumpState"
 local CharacterPhysics = require "CharacterPhysics"
 local CharacterSlideState = require "CharacterSlideState"
 local CharacterStandState = require "CharacterStandState"
@@ -39,14 +38,12 @@ function Character.new(args)
 
   character.walkAcceleration = args.walkAcceleration or 12
   character.maxWalkVelocity = args.maxWalkVelocity or 6
-  character.jumpVelocity = 8
-  character.maxFallVelocity = 10
+  character.jumpVelocity = 9
+  character.maxFallVelocity = 15
   character.maxGrabDistance = 2
   character.driftAcceleration = args.driftAcceleration or 6
   character.maxDriftVelocity = args.maxDriftVelocity or 3
   character.maxSlideVelocity = args.maxSlideVelocity or 6
-  character.longJumpVelocity = 6
-  character.longJumpAngle = math.pi / 3
 
   character.throwVelocity = 8
 
@@ -146,8 +143,6 @@ function Character:setLowerState(state)
     self.lowerState = CharacterJumpState.new({character = self})
   elseif state == "land" then
     self.lowerState = CharacterLandState.new({character = self})
-  elseif state == "longJump" then
-    self.lowerState = CharacterLongJumpState.new({character = self})
   elseif state == "slide" then
     self.lowerState = CharacterSlideState.new({character = self})
   elseif state == "stand" then
