@@ -26,13 +26,14 @@ end
 function CharacterThrowState:update(dt)
   local inputY = (self.character.downInput and 1 or 0) - (self.character.upInput and 1 or 0)
 
-  local angle = inputY * 0.25 * math.pi - 0.25 * math.pi
-
   game.sounds.throw:clone():play()
 
+  local throwVelocity = self.character.throwVelocity * math.sqrt(0.5 * (2 - inputY))
+  local throwAngle = -0.25 * math.pi
+
   local velocityX, velocityY = self.character.physics.body:getLinearVelocity()
-  velocityX = velocityX + self.character.direction * self.character.throwVelocity * math.cos(angle)
-  velocityY = velocityY + self.character.throwVelocity * math.sin(angle)
+  velocityX = velocityX + self.character.direction * throwVelocity * math.cos(throwAngle)
+  velocityY = velocityY + throwVelocity * math.sin(throwAngle)
 
   self.character.captive.physics.body:setLinearVelocity(velocityX, velocityY)
   self.character.captive.physics.body:setAngularVelocity(-math.pi * self.character.direction * (1 + love.math.random()))

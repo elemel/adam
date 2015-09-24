@@ -1,5 +1,6 @@
 local Background = require "Background"
 local Ball = require "Ball"
+local Block = require "Block"
 local Character = require "Character"
 local common = require "common"
 local Fire = require "Fire"
@@ -72,6 +73,8 @@ function love.load()
     images = {
       background = love.graphics.newImage("resources/images/background.png"),
       foreground = love.graphics.newImage("resources/images/foreground.png"),
+
+      block = love.graphics.newImage("resources/images/block.png"),
 
       adamBody = love.graphics.newImage("resources/images/adamBody.png"),
       adamHead = love.graphics.newImage("resources/images/adamHead.png"),
@@ -277,6 +280,8 @@ function love.load()
   --   radius = 1.5,
   -- })
 
+  Block.new()
+
   Character.new({
     name = "adam",
     width = 0.8,
@@ -321,8 +326,8 @@ function love.load()
 
   Background.new()
   TrackingShot.new()
-  VictorAi.new()
-  VillagerAi.new()
+  -- VictorAi.new()
+  -- VillagerAi.new()
   -- Lightning.new({x1 = 0, y1 = -16, x2 = 0, y2 = 0})
 
   KeyboardInput.new()

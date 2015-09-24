@@ -45,7 +45,7 @@ function Character.new(args)
   character.maxDriftVelocity = args.maxDriftVelocity or 3
   character.maxSlideVelocity = args.maxSlideVelocity or 6
 
-  character.throwVelocity = 8
+  character.throwVelocity = 9
 
   character.upInput = false
   character.leftInput = false
